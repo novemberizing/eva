@@ -41,13 +41,9 @@ struct xsocket
     xint32 value;
     xuint32 status;
     xuint32 mode;
-
-    xint32 domain;
-    xint32 type;
-    xint32 protocol;
 };
 
-extern xsocket * xsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const xsocketset * set, xuint64 size);
+extern xsocket * xsocketNew(xint32 value, const xsocketset * set, xuint64 size);
 
 #define xsocketDel(o)               (o->set->del(o))
 #define xsocketOpen(o)              (o->set->open(o))

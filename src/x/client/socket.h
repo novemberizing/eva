@@ -6,6 +6,10 @@
 
 #define xclientsocket_invalid_value xsocket_invalud_value
 
+#define xclientsocketshutdown_in    xsocketshutdown_in
+#define xclientsocketshutdown_out   xsocketshutdown_out
+#define xclientsocketshutdown_all   xsocketshutdown_all
+
 #define xclientsocketmode_nonblock  xsocketmode_nonblock
 
 #define xclientsocketevent_open     xsocketevent_open

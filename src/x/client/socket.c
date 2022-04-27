@@ -34,7 +34,11 @@ static xclientsocketset virtualSet = {
 
 extern xclientsocket * xclientsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen)
 {
-    xclientsocket * o = (xclientsocket *) xsocketNew(value, domain, type, protocol, (xsocketset *) xaddressof(virtualSet), sizeof(xclientsocket));
+    xclientsocket * o = (xclientsocket *) xsocketNew(value, (xsocketset *) xaddressof(virtualSet), sizeof(xclientsocket));
+
+    o->domain = domain;
+    o->type = type;
+    o->protocol = protocol;
 
     o->address.length = addressLen;
     o->address.value = o->address.length > 0 ? malloc(o->address.length) : xnil;
@@ -51,7 +55,6 @@ static xclientsocket * clientsocketDel(xclientsocket * o)
     {
         clientsocketShutdown(o, xsocketshutdown_all);
         clientsocketClose(o);
-        printf("%p\n", o->sync);
         o->sync = xsyncDel(o->sync);
         o->stream.in = xstreamDel(o->stream.in);
         o->stream.out = xstreamDel(o->stream.out);

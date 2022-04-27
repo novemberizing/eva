@@ -11,7 +11,11 @@ libnovemberizing_a_SOURCES = x/std.c                                  \
                              x/descriptor.c                           \
                              x/socket.c                               \
                              x/client/socket.c                        \
+                             x/session/socket.c                       \
+                             x/session/socket/pool.c                  \
+                             x/server/socket.c                        \
                              x/client.c                               \
+                             x/server.c                               \
                              x/event/engine.c
 
 LIBS = libnovemberizing.a                                             \
@@ -23,14 +27,22 @@ nobase_include_HEADERS = x/std.h                                      \
                          x/descriptor.h                               \
                          x/socket.h                                   \
                          x/client/socket.h                            \
+                         x/session/socket.h                           \
+                         x/session/socket/pool.h                      \
+                         x/server/socket.h                            \
                          x/client.h                                   \
+                         x/server.h                                   \
                          x/event/engine.h
 
 noinst_PROGRAMS = ExampleSync                                         \
                   ExampleClientSocket                                 \
                   ExampleClientSocketNonblock                         \
                   ExampleClient                                       \
-                  ExampleClientNonblock
+                  ExampleClientNonblock                               \
+                  ExampleServerSocket
+
+ExampleServerSocket_SOURCES = example/ExampleServerSocket.c
+ExampleServerSocket_LDADD = $(LIBS)
 
 ExampleSync_SOURCES = example/ExampleSync.c
 ExampleSync_LDADD   = $(LIBS)
