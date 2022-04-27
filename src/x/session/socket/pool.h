@@ -4,6 +4,11 @@
 #include <x/server/socket.h>
 #include <x/session/socket.h>
 
+struct xsessionsocket;
+struct xserversocket;
+typedef struct xsessionsocket xsessionsocket;
+typedef struct xserversocket xserversocket;
+
 struct xsessionsocketpool;
 struct xsessionsocketpoolset;
 
@@ -19,6 +24,8 @@ struct xsessionsocketpool
     xsessionsocket * tail;
     xuint64 size;
     xuint64 capacity;
+
+    xserversocket * serversocket;
 };
 
 struct xsessionsocketpoolset

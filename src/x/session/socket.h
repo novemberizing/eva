@@ -3,6 +3,7 @@
 
 #include <x/socket.h>
 #include <x/server/socket.h>
+#include <x/session/socket/pool.h>
 #include <x/stream.h>
 
 struct xsessionsocketpool;

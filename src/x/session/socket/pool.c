@@ -23,10 +23,11 @@ extern xsessionsocketpool * xsessionsocketpoolNew(xuint64 capacity, xserversocke
 
     o->set = xaddressof(virtualSet);
     o->capacity = capacity;
+    o->serversocket = serversocket;
 
     for(xuint64 i = 0; i < capacity; i++)
     {
-        sessionsocketpoolPush(o, xsessionsocketNew(xsessionsocket_invalid_value, serversocket));
+        sessionsocketpoolPush(o, xsessionsocketNew(xsessionsocket_invalid_value, o));
     }
 
     return o;
@@ -129,5 +130,26 @@ static void sessionsocketpoolRem(xsessionsocketpool * o, xsessionsocket * sessio
 
 static void sessionsocketpoolClear(xsessionsocketpool * o)
 {
-    // TODO:
+    xsyncLock(o->sync);
+    xsessionsocket * node = xnil;
+
+    do {
+        node = o->head;
+
+        o->head = node->sessionsocketpool.next;
+        if(o->head)
+        {
+            o->head->sessionsocketpool.prev = xnil;
+        }
+        else
+        {
+            o->tail = xnil;
+        }
+        o->size = o->size - 1;
+        node->sessionsocketpool.container = xnil;
+        node->sessionsocketpool.next = xnil;
+        xsessionsocketDel(node);
+    } while(o->head);
+
+    xsyncUnlock(o->sync);
 }
