@@ -54,6 +54,12 @@ struct xsessionsocket
         xsessionsocket * prev;
         xsessionsocket * next;
     } sessionsocketpool;
+
+    struct {
+        xserversocket * container;
+        xsessionsocket * prev;
+        xsessionsocket * next;
+    } serversocket;
 };
 
 struct xsessionsocketset
@@ -66,7 +72,7 @@ struct xsessionsocketset
     xint32 (*shutdown)(xsessionsocket *, xint32);
 };
 
-extern xsessionsocket * xsessionsocketNew(xint32 value, xsessionsocketpool * sessionsocketpool);
+extern xsessionsocket * xsessionsocketNew(xint32 value);
 
 #define xsessionsocketDel(o)                        (o->set->del(o))
 #define xsessionsocketOpen(o)                       (o->set->open(o))

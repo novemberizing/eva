@@ -24,13 +24,12 @@ static xsessionsocketset virtualSet = {
     sessionsocketShutdown
 };
 
-extern xsessionsocket * xsessionsocketNew(xint32 value, xsessionsocketpool * sessionsocketpool)
+extern xsessionsocket * xsessionsocketNew(xint32 value)
 {
     xsessionsocket * o = (xsessionsocket *) xsocketNew(value, (xsocketset *) xaddressof(virtualSet), sizeof(xsessionsocket));
 
     o->stream.in = xstreamNew(0, 0);
     o->stream.out = xstreamNew(0, 0);
-    o->sessionsocketpool.container = sessionsocketpool;
 
     return o;
 }

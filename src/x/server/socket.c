@@ -12,6 +12,9 @@ static xint64 serversocketRead(xserversocket * o);
 static xint64 serversocketWrite(xserversocket * o);
 static xint32 serversocketClose(xserversocket * o);
 static xint32 serversocketShutdown(xserversocket * o, xint32 how);
+static void serversocketPush(xserversocket * o, xsessionsocket * sessionsocket);
+static void serversocketRem(xserversocket * o, xsessionsocket * sessionsocket);
+static void serversocketClear(xserversocket * o);
 
 static xserversocketset virtualSet = {
     serversocketDel,
@@ -19,7 +22,10 @@ static xserversocketset virtualSet = {
     serversocketRead,
     serversocketWrite,
     serversocketClose,
-    serversocketShutdown
+    serversocketShutdown,
+    serversocketPush,
+    serversocketRem,
+    serversocketClear
 };
 
 extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen)
@@ -34,6 +40,8 @@ extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type
     o->address.value = malloc(o->address.length);
 
     memcpy(o->address.value, address, o->address.length);
+
+    o->sessionsocketpool = xsessionsocketpoolNew(1024, o);
 
     return o;
 }
@@ -86,7 +94,14 @@ static xint32 serversocketOpen(xserversocket * o)
 
 static xint64 serversocketRead(xserversocket * o)
 {
-    // 
+    xsessionsocket * sessionsocket = xsessionsocketpoolPop(o->sessionsocketpool);
+
+    if(sessionsocket == xnil)
+    {
+        sessionsocket = xsessionsocketNew(xsessionsocket_invalid_value);
+    }
+
+
 }
 
 static xint64 serversocketWrite(xserversocket * o)
@@ -123,4 +138,65 @@ static xint32 serversocketShutdown(xserversocket * o, xint32 how)
         xint32 ret = shutdown(o->value, how);
     }
     return xsuccess;
+}
+
+static void serversocketPush(xserversocket * o, xsessionsocket * sessionsocket)
+{
+    xsyncLock(o->sync);
+    sessionsocket->serversocket.prev = o->tail;
+    
+    if(sessionsocket->serversocket.prev)
+    {
+        sessionsocket->serversocket.prev->serversocket.next = sessionsocket;
+    }
+    else
+    {
+        o->head = sessionsocket;
+    }
+
+    o->tail = sessionsocket;
+    o->size = o->size + 1;
+    xsyncUnlock(o->sync);
+}
+
+static void serversocketRem(xserversocket * o, xsessionsocket * sessionsocket)
+{
+    if(o)
+    {
+        xsyncLock(o->sync);
+        xsessionsocket * prev = sessionsocket->serversocket.prev;
+        xsessionsocket * next = sessionsocket->serversocket.next;
+        if(sessionsocket->serversocket.prev)
+        {
+            prev->serversocket.next = next;
+            sessionsocket->serversocket.prev = xnil;
+        }
+        else
+        {
+            o->head = sessionsocket;
+        }
+        if(next)
+        {
+            next->serversocket.prev = prev;
+            sessionsocket->serversocket.next = xnil;
+        }
+        else
+        {
+            o->tail = sessionsocket;
+        }
+        o->size = o->size - 1;
+        xsyncUnlock(o->sync);
+        xsessionsocketpoolPush(o->sessionsocketpool, sessionsocket);
+    }
+}
+static void serversocketClear(xserversocket * o)
+{
+    xsyncLock(o->sync);
+    xsessionsocket * node = xnil;
+    do {
+        node = o->head;
+
+        xsessionsocketpoolPush(o->sessionsocketpool, node);
+    } while(o->head);
+    xsyncUnlock(o->sync);
 }

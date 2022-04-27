@@ -2,6 +2,10 @@
 #define   __NOVEMBERIZING_X_SERVER__SOCKET__H__
 
 #include <x/socket.h>
+#include <x/session/socket/pool.h>
+
+struct xsessionsocketpool;
+typedef struct xsessionsocketpool xsessionsocketpool;
 
 #define xserversocket_invalid_value     xsocket_invalud_value
 
@@ -32,6 +36,12 @@ struct xserversocket
         xuint64 length;
         void * value;
     } address;
+
+    xsessionsocketpool * sessionsocketpool;
+
+    xsessionsocket * head;
+    xsessionsocket * tail;
+    xuint64 size;
 };
 
 struct xserversocketset
@@ -42,6 +52,9 @@ struct xserversocketset
     xint64 (*write)(xserversocket *);
     xint32 (*close)(xserversocket *);
     xint32 (*shutdown)(xserversocket *, xint32);
+    void (*push)(xserversocket *, xsessionsocket *);
+    void (*rem)(xserversocket *, xsessionsocket *);
+    void (*clear)(xserversocket *);
 };
 
 extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen);
@@ -52,5 +65,8 @@ extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type
 #define xserversocketWrite(o)               (o->set->write(o))
 #define xserversocketClose(o)               (o->set->close(o))
 #define xserversocketShutdown(o, how)       (o->set->shutdown(o, how))
+#define xserversocketPush(o, session)       (o->set->push(o, session))
+#define xserversocketRem(o, session)        (o->set->rem(o, session))
+#define xserversocketClear(o, session)      (o->set->clear(o))
 
 #endif // __NOVEMBERIZING_X_SERVER__SOCKET__H__

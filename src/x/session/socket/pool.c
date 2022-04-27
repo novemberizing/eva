@@ -27,7 +27,7 @@ extern xsessionsocketpool * xsessionsocketpoolNew(xuint64 capacity, xserversocke
 
     for(xuint64 i = 0; i < capacity; i++)
     {
-        sessionsocketpoolPush(o, xsessionsocketNew(xsessionsocket_invalid_value, o));
+        sessionsocketpoolPush(o, xsessionsocketNew(xsessionsocket_invalid_value));
     }
 
     return o;
