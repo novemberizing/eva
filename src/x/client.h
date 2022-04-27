@@ -4,12 +4,37 @@
 #include <x/client/socket.h>
 
 struct xclient;
+struct xclientset;
 
 typedef struct xclient xclient;
+typedef struct xclientset xclientset;
 
 struct xclient
 {
-    
+    const xclientset * set;
+
+    xclientsocket * socket;
 };
+
+struct xclientset
+{
+    xclient * (*del)(xclient *);
+    xint32 (*connect)(xclient *);
+    xint64 (*read)(xclient *);
+    xint64 (*write)(xclient *);
+    xint64 (*send)(xclient *, const unsigned char *, xuint64);
+    xint64 (*recv)(xclient *, unsigned char *, xuint64);
+    xint32 (*close)(xclient *);
+};
+
+extern xclient * xclientNew(xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen);
+
+#define xclientDel(o)                       (o->set->del(o))
+#define xclientConnect(o)                   (o->set->connect(o))
+#define xclientRead(o)                      (o->set->read(o))
+#define xclientWrite(o)                     (o->set->write(o))
+#define xclientSend(o, message, length)     (o->set->send(o, message, length))
+#define xclientRecv(o, buffer, length)      (o->set->recv(o, buffer, length))
+#define xclientClose(o)                     (o->set->close(o))
 
 #endif // __NOVEMBERIZING_X__CLIENT__H__

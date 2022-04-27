@@ -11,6 +11,7 @@ libnovemberizing_a_SOURCES = x/std.c                                  \
                              x/descriptor.c                           \
                              x/socket.c                               \
                              x/client/socket.c                        \
+                             x/client.c                               \
                              x/event/engine.c
 
 LIBS = libnovemberizing.a                                             \
@@ -21,11 +22,15 @@ nobase_include_HEADERS = x/std.h                                      \
                          x/stream.h                                   \
                          x/descriptor.h                               \
                          x/socket.h                                   \
-                         x/client/socket.h
+                         x/client/socket.h                            \
+                         x/client.h                                   \
+                         x/event/engine.h
 
 noinst_PROGRAMS = ExampleSync                                         \
                   ExampleClientSocket                                 \
-                  ExampleClientSocketNonblock
+                  ExampleClientSocketNonblock                         \
+                  ExampleClient                                       \
+                  ExampleClientNonblock
 
 ExampleSync_SOURCES = example/ExampleSync.c
 ExampleSync_LDADD   = $(LIBS)
@@ -35,6 +40,12 @@ ExampleClientSocket_LDADD   = $(LIBS)
 
 ExampleClientSocketNonblock_SOURCES = example/ExampleClientSocketNonblock.c
 ExampleClientSocketNonblock_LDADD   = $(LIBS)
+
+ExampleClient_SOURCES = example/ExampleClient.c
+ExampleClient_LDADD = $(LIBS)
+
+ExampleClientNonblock_SOURCES = example/ExampleClientNonblock.c
+ExampleClientNonblock_LDADD = $(LIBS)
 
 # noinst_PROGRAMS = SimpleEventEngine                                   \
 #                   SimpleConsoleIn                                     \

@@ -15,11 +15,11 @@ int main(int argc, char ** argv)
     addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     addr.sin_port = htons(6379);
 
-    xclientsocket * o = xclienetsocketNew(xdescriptor_invalid_value, AF_INET, SOCK_STREAM, IPPROTO_TCP, xaddressof(addr), sizeof(struct sockaddr_in));
+    xclientsocket * o = xclientsocketNew(xdescriptor_invalid_value, AF_INET, SOCK_STREAM, IPPROTO_TCP, xaddressof(addr), sizeof(struct sockaddr_in));
     xclientsocketSetMode(o, xclientsocketmode_nonblock);
     xint32 ret = xclientsocketConnect(o);
     xassert(ret != xsuccess, "client is not connected");
-    if(xeventengineWait((xdescriptor *) o, xclientsocketevent_connect, 0, 0))
+    if(xeventengineWait((xdescriptor *) o, xclientsocketevent_connect, 0, 0) == xsuccess)
     {
         printf("nonblock connect\n");
         xclientsocketSend(o, "ping\r\n", 7);

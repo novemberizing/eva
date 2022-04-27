@@ -3,6 +3,8 @@
 
 #include <x/descriptor.h>
 
+#define xsocket_invalud_value       xdescriptor_invalid_value
+
 #define xsocketshutdown_in          1
 #define xsocketshutdown_out         2
 #define xsocketshutdown_all         3

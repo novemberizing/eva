@@ -109,5 +109,5 @@ extern xint64 xeventengineWait(xdescriptor * descriptor, xuint32 events, xint64 
         }
 
     }
-    return collecting == events ? xtrue : xfalse;
+    return collecting == events ? xsuccess : xfail;
 }

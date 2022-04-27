@@ -4,6 +4,8 @@
 #include <x/socket.h>
 #include <x/stream.h>
 
+#define xclientsocket_invalid_value xsocket_invalud_value
+
 #define xclientsocketmode_nonblock  xsocketmode_nonblock
 
 #define xclientsocketevent_open     xsocketevent_open
@@ -56,7 +58,7 @@ struct xclientsocketset
     xint64 (*recv)(xclientsocket *, unsigned char *, xuint64);
 };
 
-extern xclientsocket * xclienetsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen);
+extern xclientsocket * xclientsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen);
 
 #define xclientsocketDel(o)                     (o->set->del(o))
 #define xclientsocketOpen(o)                    (o->set->open(o))
@@ -66,7 +68,7 @@ extern xclientsocket * xclienetsocketNew(xint32 value, xint32 domain, xint32 typ
 #define xclientsocketShutdown(o, how)           (o->set->shutdown(o, how))
 #define xclientsocketConnect(o)                 (o->set->connect(o))
 #define xclientsocketSend(o, message, length)   (o->set->send(o, message, length))
-#define xclientsocketRecv(o, message, length)   (o->set->recv(o, message, length))
+#define xclientsocketRecv(o, buffer, length)    (o->set->recv(o, buffer, length))
 
 #define xclientsocketSetMode(o, value)          (o->mode = o->mode | value);
 

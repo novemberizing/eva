@@ -32,7 +32,7 @@ static xclientsocketset virtualSet = {
     clientsocketRecv
 };
 
-extern xclientsocket * xclienetsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen)
+extern xclientsocket * xclientsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen)
 {
     xclientsocket * o = (xclientsocket *) xsocketNew(value, domain, type, protocol, (xsocketset *) xaddressof(virtualSet), sizeof(xclientsocket));
 

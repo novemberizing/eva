@@ -14,7 +14,7 @@ int main(int argc, char ** argv)
     addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     addr.sin_port = htons(6379);
 
-    xclientsocket * o = xclienetsocketNew(xdescriptor_invalid_value, AF_INET, SOCK_STREAM, IPPROTO_TCP, xaddressof(addr), sizeof(struct sockaddr_in));
+    xclientsocket * o = xclientsocketNew(xdescriptor_invalid_value, AF_INET, SOCK_STREAM, IPPROTO_TCP, xaddressof(addr), sizeof(struct sockaddr_in));
 
     xint32 ret = xclientsocketConnect(o);
 
