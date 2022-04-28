@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <pthread.h>
+#include <errno.h>
 
 #include "socket.h"
 
@@ -16,6 +18,7 @@ static void serversocketPush(xserversocket * o, xsessionsocket * sessionsocket);
 static void serversocketRem(xserversocket * o, xsessionsocket * sessionsocket);
 static void serversocketClear(xserversocket * o);
 static xsessionsocket * serversocketAccept(xserversocket * o);
+static void serversocketRel(xserversocket * o, xsessionsocket * sessionsocket);
 
 static xserversocketset virtualSet = {
     serversocketDel,
@@ -27,7 +30,8 @@ static xserversocketset virtualSet = {
     serversocketPush,
     serversocketRem,
     serversocketClear,
-    
+    serversocketAccept,
+    serversocketRel
 };
 
 extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen)
@@ -57,6 +61,7 @@ static xserversocket * serversocketDel(xserversocket * o)
 
         o->sync = xsyncDel(o->sync);
         o->address.value = xobjectDel(o->address.value);
+        o->sessionsocketpool = xsessionsocketpoolDel(o->sessionsocketpool);
 
         free(o);
     }
@@ -70,6 +75,15 @@ static xint32 serversocketOpen(xserversocket * o)
         o->value = socket(o->domain, o->type, o->protocol);
         if(o->value >= 0)
         {
+            if(o->mode & xserversocketmode_reuseaddr)
+            {
+                xint32 value = 1;
+                xfunctionInfo("xserversocketmode_reuseaddr\n");
+                if(setsockopt(o->value, SOL_SOCKET, SO_REUSEADDR, xaddressof(value), sizeof(xint32)) < 0)
+                {
+                    xfunctionThrow("fail to setsockopt(...) caused by %d\n", errno);
+                }
+            }
             if(bind(o->value, (struct sockaddr *) o->address.value, (socklen_t) o->address.length) == xsuccess)
             {
                 if(listen(o->value, SOMAXCONN) == xsuccess)
@@ -78,16 +92,19 @@ static xint32 serversocketOpen(xserversocket * o)
                 }
                 else
                 {
+                    xfunctionInfo("fail to listen(...) caused by %d\n", errno);
                     serversocketClose(o);
                 }
             }
             else
             {
+                xfunctionInfo("fail to bind(...) caused by %d\n", errno);
                 serversocketClose(o);
             }
         }
         else
         {
+            xfunctionInfo("fail to socket(...) caused by %d\n", errno);
             // 소켓을 생성하지 못한다.
         }
     }
@@ -180,7 +197,6 @@ static void serversocketRem(xserversocket * o, xsessionsocket * sessionsocket)
         }
         o->size = o->size - 1;
         xsyncUnlock(o->sync);
-        xsessionsocketpoolPush(o->sessionsocketpool, sessionsocket);
     }
 }
 static void serversocketClear(xserversocket * o)
@@ -225,7 +241,21 @@ static xsessionsocket * serversocketAccept(xserversocket * o)
             sessionsocket->address.length = addrlen;
             sessionsocket->address.value = malloc(sessionsocket->address.length);
             memcpy(sessionsocket->address.value, xaddressof(addr), sessionsocket->address.length);
+
+            serversocketPush(o, sessionsocket);
+
+            xfunctionInfo("server size => %ld\n", o->size);
+            xfunctionInfo("sessionsocketpool size => %ld\n", o->sessionsocketpool->size);
         }
     }
     return sessionsocket;
+}
+
+static void serversocketRel(xserversocket * o, xsessionsocket * sessionsocket)
+{
+    serversocketRem(o, sessionsocket);
+    xsessionsocketpoolRel(o->sessionsocketpool, sessionsocket);
+
+    xfunctionInfo("server size => %ld\n", o->size);
+    xfunctionInfo("sessionsocketpool size => %ld\n", o->sessionsocketpool->size);
 }

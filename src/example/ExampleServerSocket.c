@@ -13,9 +13,15 @@ int main(int argc, char ** argv)
     addr.sin_port = htons(3371);
 
     xserversocket * socket = xserversocketNew(xserversocket_invalid_value, AF_INET, SOCK_STREAM, IPPROTO_TCP, xaddressof(addr), sizeof(struct sockaddr_in));
+    xserversocketSetMode(socket, xserversocketmode_reuseaddr);
     if(xserversocketOpen(socket) == xsuccess)
     {
-        
+        xsessionsocket * sessionsocket = xserversocketAccept(socket);
+        if(sessionsocket)
+        {
+            xsessionsocketClose(sessionsocket);
+            xserversocketRel(socket, sessionsocket);
+        }
         xserversocketClose(socket);
     }
     else

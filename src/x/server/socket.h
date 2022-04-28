@@ -12,6 +12,9 @@ typedef struct xsessionsocketpool xsessionsocketpool;
 
 #define xserversocket_invalid_value     xsocket_invalud_value
 
+#define xserversocketmode_nonblock      xsocketmode_nonblock
+#define xserversocketmode_reuseaddr     xsocketmode_reuseaddr
+
 #define xserversocketshutdown_in        xsocketshutdown_in
 #define xserversocketshutdown_out       xsocketshutdown_out
 #define xserversocketshutdown_all       xsocketshutdown_all
@@ -59,6 +62,7 @@ struct xserversocketset
     void (*rem)(xserversocket *, xsessionsocket *);
     void (*clear)(xserversocket *);
     xsessionsocket * (*accept)(xserversocket *);
+    void (*release)(xserversocket *, xsessionsocket *);
 };
 
 extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen);
@@ -73,5 +77,8 @@ extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type
 #define xserversocketRem(o, session)        (o->set->rem(o, session))
 #define xserversocketClear(o, session)      (o->set->clear(o))
 #define xserversocketAccept(o)              (o->set->accept(o))
+#define xserversocketRel(o, session)        (o->set->release(o, session))
+
+#define xserversocketSetMode(o, value)      (o->mode = o->mode | value)
 
 #endif // __NOVEMBERIZING_X_SERVER__SOCKET__H__

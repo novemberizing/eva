@@ -10,6 +10,7 @@
 #define xsocketshutdown_all         3
 
 #define xsocketmode_nonblock        xdescriptormode_nonblock
+#define xsocketmode_reuseaddr       (0x00010000 << 0U)
 
 #define xsocketevent_open           xdescriptorevent_open
 #define xsocketevent_in             xdescriptorevent_in
