@@ -18,16 +18,52 @@ typedef __UINT64_TYPE__     xuint64;
 
 #define xaddressof(o)       (&(o))
 
-#define xassert(condition, format, ...) do {    \
-    if(condition) {                             \
-        printf(format, ##__VA_ARGS__);          \
-        exit(0);                                \
-    }                                           \
+#define xfunctionAssert(condition, format, ...) do {                                                                                \
+    if(condition) {                                                                                                                 \
+        printf("[assertion:%s:%d %s:%ld] " #condition " " format, __FILE__, __LINE__, __func__, pthread_self(), ##__VA_ARGS__);     \
+        exit(0);                                                                                                                    \
+    }                                                                                                                               \
 } while(0)
 
-#define xthrow(format,...)   do {               \
-    printf(format, ##__VA_ARGS__);              \
-    exit(0);                                    \
+#define xfunctionThrow(format,...)   do {                                                                                           \
+    printf("[exception:%s:%d %s:%ld] " format, __FILE__, __LINE__, __func__, pthread_self(), ##__VA_ARGS__);                        \
+    exit(0);                                                                                                                        \
+} while(0)
+
+#define xfunctionStart(format, ...) do {                                                                                            \
+    printf("[start:%s:%d %s:%ld] " format, __FILE__, __LINE__, __func__, pthread_self(), ##__VA_ARGS__);                            \
+} while(0)
+
+#define xfunctionEnd(format, ...) do {                                                                                              \
+    printf("[end:%s:%d %s:%ld] " format, __FILE__, __LINE__, __func__, pthread_self(), ##__VA_ARGS__);                              \
+} while(0)
+
+#define xfunctionError(format, ...) do {                                                                                            \
+    printf("[error:%s:%d %s:%ld] " format, __FILE__, __LINE__, __func__, pthread_self(), ##__VA_ARGS__);                            \
+} while(0)
+
+#define xfunctionWarning(format, ...) do {                                                                                          \
+    printf("[warning:%s:%d %s:%ld] " format, __FILE__, __LINE__, __func__, pthread_self(), ##__VA_ARGS__);                          \
+} while(0)
+
+#define xfunctionCaution(format, ...) do {                                                                                          \
+    printf("[caution:%s:%d %s:%ld] " format, __FILE__, __LINE__, __func__, pthread_self(), ##__VA_ARGS__);                          \
+} while(0)
+
+#define xfunctionNotice(format, ...) do {                                                                                           \
+    printf("[notice:%s:%d %s:%ld] " format, __FILE__, __LINE__, __func__, pthread_self(), ##__VA_ARGS__);                           \
+} while(0)
+
+#define xfunctionInfo(format, ...) do {                                                                                             \
+    printf("[information:%s:%d %s:%ld] " format, __FILE__, __LINE__, __func__, pthread_self(), ##__VA_ARGS__);                      \
+} while(0)
+
+#define xfunctionDebug(format, ...) do {                                                                                            \
+    printf("[debug:%s:%d %s:%ld] " format, __FILE__, __LINE__, __func__, pthread_self(), ##__VA_ARGS__);                            \
+} while(0)
+
+#define xfunctionVerbose(format, ...) do {                                                                                          \
+    printf("[verbose:%s:%d %s:%ld] " format, __FILE__, __LINE__, __func__, pthread_self(), ##__VA_ARGS__);                          \
 } while(0)
 
 extern void * xobjectDel(void * o);

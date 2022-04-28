@@ -3,6 +3,7 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include <x/client/socket.h>
 
@@ -18,7 +19,7 @@ int main(int argc, char ** argv)
 
     xint32 ret = xclientsocketConnect(o);
 
-    xassert(ret != xsuccess, "client is not connected");
+    xfunctionAssert(ret != xsuccess, "client is not connected");
 
     xclientsocketSend(o, "ping\r\n", 7);
 

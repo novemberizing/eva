@@ -4,7 +4,10 @@
 #include <x/socket.h>
 #include <x/session/socket/pool.h>
 
+struct xsessionsocket;
 struct xsessionsocketpool;
+
+typedef struct xsessionsocket xsessionsocket;
 typedef struct xsessionsocketpool xsessionsocketpool;
 
 #define xserversocket_invalid_value     xsocket_invalud_value

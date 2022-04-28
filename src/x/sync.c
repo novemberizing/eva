@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include "sync.h"
 
@@ -12,7 +13,7 @@ extern xsync * xsyncNew(xuint32 type)
     case xsynctype_mutex:   return (xsync *) xsyncmutexNew();
     }
 
-    xthrow("invalid parameter");
+    xfunctionThrow("invalid parameter");
 
     return xnil;
 }

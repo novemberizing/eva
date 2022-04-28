@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
 
 #include "stream.h"
 
@@ -43,7 +44,7 @@ static xstream * streamDel(xstream * o)
 
 static void streamReserve(xstream * o, xuint64 capacity, xuint64 page)
 {
-    xassert(o == xnil, "invalid parameter");
+    xfunctionAssert(o == xnil, "invalid parameter");
 
     if(xstreamLen(o) > 0)
     {
@@ -80,7 +81,7 @@ static void streamReserve(xstream * o, xuint64 capacity, xuint64 page)
 
 static void streamPush(xstream * o, const unsigned char * message, xuint64 length)
 {
-    xassert(o == xnil || message == xnil || length == 0, "invalid parameter");
+    xfunctionAssert(o == xnil || message == xnil || length == 0, "invalid parameter");
 
     streamReserve(o, length, 1);
     

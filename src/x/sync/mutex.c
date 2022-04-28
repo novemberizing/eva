@@ -60,7 +60,7 @@ static xint32 syncmutexUnlock(xsyncmutex * o)
 
 static xint32 syncmutexWait(xsyncmutex * o, xint64 second, xint64 nanosecond)
 {
-    xassert(second < 0 || nanosecond < 0, "invalid parameter");
+    xfunctionAssert(second < 0 || nanosecond < 0, "invalid parameter");
 
     xint32 ret = xsuccess;
 
