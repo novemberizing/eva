@@ -79,10 +79,10 @@ static xint32 serversocketOpen(xserversocket * o)
             if(o->mode & xserversocketmode_reuseaddr)
             {
                 xint32 value = 1;
-                xfunctionInfo("xserversocketmode_reuseaddr\n");
+                xfunctionInfo("xserversocketmode_reuseaddr");
                 if(setsockopt(o->value, SOL_SOCKET, SO_REUSEADDR, xaddressof(value), sizeof(xint32)) < 0)
                 {
-                    xfunctionThrow("fail to setsockopt(...) caused by %d\n", errno);
+                    xfunctionThrow("fail to setsockopt(...) caused by %d", errno);
                 }
             }
             if(o->mode & xserversocketmode_nonblock)
@@ -98,13 +98,13 @@ static xint32 serversocketOpen(xserversocket * o)
                 }
                 else
                 {
-                    xfunctionInfo("fail to listen(...) caused by %d\n", errno);
+                    xfunctionInfo("fail to listen(...) caused by %d", errno);
                     serversocketClose(o);
                 }
             }
             else
             {
-                xfunctionInfo("fail to bind(...) caused by %d\n", errno);
+                xfunctionInfo("fail to bind(...) caused by %d", errno);
                 serversocketClose(o);
             }
         }
@@ -250,8 +250,8 @@ static xsessionsocket * serversocketAccept(xserversocket * o)
 
             serversocketPush(o, sessionsocket);
 
-            xfunctionInfo("server size => %ld\n", o->size);
-            xfunctionInfo("sessionsocketpool size => %ld\n", o->sessionsocketpool->size);
+            xfunctionInfo("server size => %ld", o->size);
+            xfunctionInfo("sessionsocketpool size => %ld", o->sessionsocketpool->size);
         }
     }
     return sessionsocket;
@@ -262,6 +262,6 @@ static void serversocketRel(xserversocket * o, xsessionsocket * sessionsocket)
     serversocketRem(o, sessionsocket);
     xsessionsocketpoolRel(o->sessionsocketpool, sessionsocket);
 
-    xfunctionInfo("server size => %ld\n", o->size);
-    xfunctionInfo("sessionsocketpool size => %ld\n", o->sessionsocketpool->size);
+    xfunctionInfo("server size => %ld", o->size);
+    xfunctionInfo("sessionsocketpool size => %ld", o->sessionsocketpool->size);
 }
