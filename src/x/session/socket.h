@@ -88,4 +88,7 @@ extern xsessionsocket * xsessionsocketNew(xint32 value);
 #define xsessionsocketClose(o)                      (o->set->close(o))
 #define xsessionsocketShutdown(o, how)              (o->set->shutdown(o, how))
 
+extern void xsessionsocketNonblockOn(xsessionsocket * o);
+extern void xsessionsocketNonblockOff(xsessionsocket * o);
+
 #endif // __NOVEMBERIZING_X_SESSION__SOCKET__H__

@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <pthread.h>
 #include <errno.h>
+#include <fcntl.h>
 
 #include "socket.h"
 
@@ -83,6 +84,11 @@ static xint32 serversocketOpen(xserversocket * o)
                 {
                     xfunctionThrow("fail to setsockopt(...) caused by %d\n", errno);
                 }
+            }
+            if(o->mode & xserversocketmode_nonblock)
+            {
+                xint32 flags = fcntl(o->value, F_GETFL, 0);
+                fcntl(o->value, F_SETFL, flags | O_NONBLOCK);
             }
             if(bind(o->value, (struct sockaddr *) o->address.value, (socklen_t) o->address.length) == xsuccess)
             {

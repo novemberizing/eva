@@ -19,6 +19,13 @@ typedef struct xsessionsocketpool xsessionsocketpool;
 #define xserversocketshutdown_out       xsocketshutdown_out
 #define xserversocketshutdown_all       xsocketshutdown_all
 
+#define xserversocketevent_open         xsocketevent_open
+#define xserversocketevent_in           xsocketevent_in
+#define xserversocketevent_out          xsocketevent_out
+#define xserversocketevent_close        xsocketevent_close
+#define xserversocketevent_connect      xsocketevent_open
+#define xserversocketevent_error        xsocketevent_error
+
 struct xserversocket;
 struct xserversocketset;
 

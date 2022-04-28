@@ -5,6 +5,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/socket.h>
+#include <pthread.h>
 
 #include "socket.h"
 
@@ -156,4 +157,20 @@ static xint32 sessionsocketShutdown(xsessionsocket * o, xint32 how)
         xint32 ret = shutdown(o->value, how);
     }
     return xsuccess;
+}
+
+extern void xsessionsocketNonblockOn(xsessionsocket * o)
+{
+    xfunctionAssert(o == xnil || o->value < 0, "invalid parameter");
+
+    xint32 flags = fcntl(o->value, F_GETFL, 0);
+    fcntl(o->value, F_SETFL, flags | O_NONBLOCK);
+}
+
+extern void xsessionsocketNonblockOff(xsessionsocket * o)
+{
+    xfunctionAssert(o == xnil || o->value < 0, "invalid parameter");
+
+    xint32 flags = fcntl(o->value, F_GETFL, 0);
+    fcntl(o->value, F_SETFL, flags & (~O_NONBLOCK));
 }

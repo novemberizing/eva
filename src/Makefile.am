@@ -39,10 +39,14 @@ noinst_PROGRAMS = ExampleSync                                         \
                   ExampleClientSocketNonblock                         \
                   ExampleClient                                       \
                   ExampleClientNonblock                               \
-                  ExampleServerSocket
+                  ExampleServerSocket                                 \
+                  ExampleServerSocketNonblck
 
 ExampleServerSocket_SOURCES = example/ExampleServerSocket.c
 ExampleServerSocket_LDADD = $(LIBS)
+
+ExampleServerSocketNonblck_SOURCES = example/ExampleServerSocketNonblock.c
+ExampleServerSocketNonblck_LDADD = $(LIBS)
 
 ExampleSync_SOURCES = example/ExampleSync.c
 ExampleSync_LDADD   = $(LIBS)
