@@ -15,6 +15,7 @@ static xint32 serversocketShutdown(xserversocket * o, xint32 how);
 static void serversocketPush(xserversocket * o, xsessionsocket * sessionsocket);
 static void serversocketRem(xserversocket * o, xsessionsocket * sessionsocket);
 static void serversocketClear(xserversocket * o);
+static xsessionsocket * serversocketAccept(xserversocket * o);
 
 static xserversocketset virtualSet = {
     serversocketDel,
@@ -25,7 +26,8 @@ static xserversocketset virtualSet = {
     serversocketShutdown,
     serversocketPush,
     serversocketRem,
-    serversocketClear
+    serversocketClear,
+    
 };
 
 extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen)
@@ -94,14 +96,6 @@ static xint32 serversocketOpen(xserversocket * o)
 
 static xint64 serversocketRead(xserversocket * o)
 {
-    xsessionsocket * sessionsocket = xsessionsocketpoolPop(o->sessionsocketpool);
-
-    if(sessionsocket == xnil)
-    {
-        sessionsocket = xsessionsocketNew(xsessionsocket_invalid_value);
-    }
-
-
 }
 
 static xint64 serversocketWrite(xserversocket * o)
@@ -196,7 +190,42 @@ static void serversocketClear(xserversocket * o)
     do {
         node = o->head;
 
+        if(node)
+        {
+            o->head = node->serversocket.next;
+            o->head->serversocket.prev = xnil;
+            node->serversocket.next = xnil;
+        }
+        else
+        {
+            o->tail = xnil;
+        }
+        o->size = o->size - 1;
+
         xsessionsocketpoolPush(o->sessionsocketpool, node);
     } while(o->head);
     xsyncUnlock(o->sync);
+}
+
+static xsessionsocket * serversocketAccept(xserversocket * o)
+{
+    xsessionsocket * sessionsocket = xnil;
+    if(o->value >= 0)
+    {
+        struct sockaddr addr;
+        socklen_t addrlen = sizeof(struct sockaddr);
+
+        int value = accept(o->value, xaddressof(addr), xaddressof(addrlen));
+
+        if(value >= 0)
+        {
+            sessionsocket = xsessionsocketpoolGet(o->sessionsocketpool);
+
+            sessionsocket->value = value;
+            sessionsocket->address.length = addrlen;
+            sessionsocket->address.value = malloc(sessionsocket->address.length);
+            memcpy(sessionsocket->address.value, xaddressof(addr), sessionsocket->address.length);
+        }
+    }
+    return sessionsocket;
 }

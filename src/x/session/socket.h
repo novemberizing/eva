@@ -45,6 +45,11 @@ struct xsessionsocket
     xint32 protocol;
 
     struct {
+        xuint64 length;
+        void * value;
+    } address;
+
+    struct {
         xstream * in;
         xstream * out;
     } stream;

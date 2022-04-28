@@ -8,13 +8,15 @@ static void sessionsocketpoolPush(xsessionsocketpool * o, xsessionsocket * sessi
 static xsessionsocket * sessionsocketpoolPop(xsessionsocketpool * o);
 static void sessionsocketpoolRem(xsessionsocketpool * o, xsessionsocket * sessionsocket);
 static void sessionsocketpoolClear(xsessionsocketpool * o);
+static xsessionsocket * sessionsocketpoolGet(xsessionsocketpool * o);
 
 static xsessionsocketpoolset virtualSet = {
     sessionsocketpoolDel,
     sessionsocketpoolPush,
     sessionsocketpoolPop,
     sessionsocketpoolRem,
-    sessionsocketpoolClear
+    sessionsocketpoolClear,
+    sessionsocketpoolGet
 };
 
 extern xsessionsocketpool * xsessionsocketpoolNew(xuint64 capacity, xserversocket * serversocket)
@@ -152,4 +154,14 @@ static void sessionsocketpoolClear(xsessionsocketpool * o)
     } while(o->head);
 
     xsyncUnlock(o->sync);
+}
+
+static xsessionsocket * sessionsocketpoolGet(xsessionsocketpool * o)
+{
+    xsessionsocket * sessionsocket = sessionsocketpoolPop(o);
+    if(sessionsocket == xnil)
+    {
+        sessionsocket = xsessionsocketNew(xsessionsocket_invalid_value);
+    }
+    return sessionsocket;
 }
