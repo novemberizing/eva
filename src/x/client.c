@@ -6,21 +6,23 @@
 #include "client/socket.h"
 
 static xclient * clientDel(xclient * o);
-static xint32 clientConnect(xclient * o);
+static xint32 clientOpen(xclient * o);
 static xint64 clientRead(xclient * o);
 static xint64 clientWrite(xclient * o);
+static xint32 clientClose(xclient * o);
+static xint32 clientConnect(xclient * o);
 static xint64 clientSend(xclient * o, const unsigned char * message, xuint64 length);
 static xint64 clientRecv(xclient * o, unsigned char * buffer, xuint64 length);
-static xint32 clientClose(xclient * o);
 
 static xclientset virtualSet = {
     clientDel,
-    clientConnect,
+    clientOpen,
     clientRead,
     clientWrite,
+    clientClose,
+    clientConnect,
     clientSend,
-    clientRecv,
-    clientClose
+    clientRecv
 };
 
 extern xclient * xclientNew(xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen)
@@ -44,9 +46,9 @@ static xclient * clientDel(xclient * o)
     return xnil;
 }
 
-static xint32 clientConnect(xclient * o)
+static xint32 clientOpen(xclient * o)
 {
-    return xclientsocketConnect(o->socket);
+    return xclientsocketOpen(o->socket);
 }
 
 static xint64 clientRead(xclient * o)
@@ -59,6 +61,16 @@ static xint64 clientWrite(xclient * o)
     return xclientsocketWrite(o->socket);
 }
 
+static xint32 clientClose(xclient * o)
+{
+    return xclientsocketClose(o->socket);
+}
+
+static xint32 clientConnect(xclient * o)
+{
+    return xclientsocketConnect(o->socket);
+}
+
 static xint64 clientSend(xclient * o, const unsigned char * message, xuint64 length)
 {
     return xclientsocketSend(o->socket, message, length);
@@ -67,9 +79,4 @@ static xint64 clientSend(xclient * o, const unsigned char * message, xuint64 len
 static xint64 clientRecv(xclient * o, unsigned char * buffer, xuint64 length)
 {
     return xclientsocketRecv(o->socket, buffer, length);
-}
-
-static xint32 clientClose(xclient * o)
-{
-    return xclientsocketClose(o->socket);
 }
