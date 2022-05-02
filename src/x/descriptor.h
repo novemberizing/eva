@@ -3,6 +3,8 @@
 
 #include <x/sync.h>
 
+#include <x/event.h>
+
 #define xdescriptor_invalid_value           (-1)
 
 #define xdescriptormode_nonblock            (0x00000001U << 0U)
@@ -18,6 +20,8 @@ struct xdescriptorset;
 
 typedef struct xdescriptor xdescriptor;
 typedef struct xdescriptorset xdescriptorset;
+
+typedef void (xdescriptoreventhandler)(xdescriptor *, xeventengine *, xuint32);
 
 struct xdescriptorset
 {
@@ -36,7 +40,7 @@ struct xdescriptor
     xint32 value;
     xuint32 status;
     xuint32 mode;
-    
+   
 };
 
 extern xdescriptor * xdescriptorNew(xint32 value, const xdescriptorset * set, xuint64 size);

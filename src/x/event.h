@@ -4,26 +4,30 @@
 #include <x/std.h>
 
 struct xevent;
+struct xeventengine;
 struct xeventobject;
-struct xeventqueue;
+struct xeventprocessor;
+struct xeventgenerator;
+struct xeventsubscription;
 
 typedef struct xevent xevent;
+typedef struct xeventengine xeventengine;
 typedef struct xeventobject xeventobject;
-typedef struct xeventqueue xeventqueue;
+typedef struct xeventprocessor xeventprocessor;
+typedef struct xeventgenerator xeventgenerator;
+typedef struct xeventsubscription xeventsubscription;
+
+
+typedef void (*xeventhandler)(xeventobject *, xeventsubscription *, xuint32);
 
 struct xevent
 {
-    void * set;
 
-    xevent * prev;
-    xevent * next;
-    xeventqueue * queue;
-
-    xeventobject * object;
-    xuint32 flags;
 };
 
-extern xevent * xeventnew(xeventobject * object, xuint32 flags);
-extern xevent * xeventdel(xevent * o);
+struct xeventset
+{
+
+};
 
 #endif // __NOVEMBERIZING_X__EVENT__H__

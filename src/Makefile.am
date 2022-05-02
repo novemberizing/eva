@@ -46,13 +46,16 @@ noinst_PROGRAMS = ExampleSync                                         \
                   ExampleClient                                       \
                   ExampleClientNonblock                               \
                   ExampleServerSocket                                 \
-                  ExampleServerSocketNonblck                          \
+                  ExampleServerSocketNonblock                         \
                   ExampleServer                                       \
-                  ExampleServerNonblock
+                  ExampleServerNonblock                               \
+                  ExampleEventEngine
+
+ExampleEventEngine_SOURCES = example/ExampleEventEngine.c
+ExampleEventEngine_LDADD = $(LIBS)
 
 ExampleServerNonblock_SOURCES = example/ExampleServerNonblock.c
 ExampleServerNonblock_LDADD = $(LIBS)
-
 
 ExampleServer_SOURCES = example/ExampleServer.c
 ExampleServer_LDADD = $(LIBS)
@@ -60,8 +63,8 @@ ExampleServer_LDADD = $(LIBS)
 ExampleServerSocket_SOURCES = example/ExampleServerSocket.c
 ExampleServerSocket_LDADD = $(LIBS)
 
-ExampleServerSocketNonblck_SOURCES = example/ExampleServerSocketNonblock.c
-ExampleServerSocketNonblck_LDADD = $(LIBS)
+ExampleServerSocketNonblock_SOURCES = example/ExampleServerSocketNonblock.c
+ExampleServerSocketNonblock_LDADD = $(LIBS)
 
 ExampleSync_SOURCES = example/ExampleSync.c
 ExampleSync_LDADD   = $(LIBS)

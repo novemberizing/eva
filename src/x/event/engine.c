@@ -3,8 +3,50 @@
 #include <errno.h>
 #include <stdio.h>
 #include <sys/socket.h>
+#include <pthread.h>
+#include <stdlib.h>
 
 #include "engine.h"
+
+#include "subscription.h"
+
+static xeventengine * engine = xnil;
+
+static xeventengine * eventengineDel(xeventengine * o);
+static xeventengine * eventengineGet(void);
+
+extern xint32 xeventengineRun(xeventengine * o)
+{
+    while(o->cancel == xnil)
+    {
+
+    }
+    o = eventengineDel(o);
+    return xsuccess;
+}
+
+static xeventengine * eventengineGet(void)
+{
+    return xnil;
+}
+
+static xeventengine * eventengineDel(xeventengine * o)
+{
+    if(o)
+    {
+        free(o);
+    }
+    return xnil;
+}
+
+extern xeventsubscription * xeventengineRegisterDescriptor(xeventengine * o, xdescriptor * descriptor, xdescriptoreventhandler on)
+{
+    xeventsubscription * subscription = xeventsubscriptionNew(o, (xeventobject *) descriptor, (xeventhandler) on);
+
+    xdescriptoreventgeneratorRegisterSubscription(o->generator.descriptor, subscription);
+
+    return subscription;
+}
 
 extern xint64 xeventengineWait(xdescriptor * descriptor, xuint32 events, xint64 second, xint64 nanosecond)
 {
