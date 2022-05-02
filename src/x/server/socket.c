@@ -176,8 +176,6 @@ static void serversocketPush(xserversocket * o, xsessionsocket * sessionsocket)
     o->tail = sessionsocket;
     o->size = o->size + 1;
     xsyncUnlock(o->sync);
-
-    xfunctionAssert(sessionsocket->parent.next, "");
 }
 
 static void serversocketRem(xserversocket * o, xsessionsocket * sessionsocket)
@@ -216,7 +214,6 @@ static void serversocketClear(xserversocket * o)
     xsessionsocket * node = xnil;
     while(o->head)
     {
-        xfunctionAssert(o->head->parent.sessionsocketpool, "");
         node = o->head;
 
         o->head = node->parent.next;
@@ -231,7 +228,6 @@ static void serversocketClear(xserversocket * o)
         }
         o->size = o->size - 1;
         node->parent.serversocket = xnil;
-        xfunctionAssert(node->parent.sessionsocketpool, "");
 
         xsessionsocketpoolPush(o->sessionsocketpool, node);
     }
@@ -251,17 +247,11 @@ static xsessionsocket * serversocketAccept(xserversocket * o)
         if(value >= 0)
         {
             sessionsocket = xsessionsocketpoolGet(o->sessionsocketpool);
-
-            xfunctionAssert(sessionsocket->parent.sessionsocketpool, "");
-
             sessionsocket->value = value;
 
             xobjectSet(xaddressof(sessionsocket->address), xaddressof(addr), addrlen);
 
             serversocketPush(o, sessionsocket);
-
-            xfunctionInfo("server size => %ld", o->size);
-            xfunctionInfo("sessionsocketpool size => %ld", o->sessionsocketpool->size);
         }
     }
     return sessionsocket;
@@ -272,7 +262,4 @@ static void serversocketRel(xserversocket * o, xsessionsocket * sessionsocket)
     serversocketRem(o, sessionsocket);
 
     xsessionsocketpoolRel(o->sessionsocketpool, sessionsocket);
-
-    xfunctionInfo("server size => %ld", o->size);
-    xfunctionInfo("sessionsocketpool size => %ld", o->sessionsocketpool->size);
 }

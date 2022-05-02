@@ -178,7 +178,5 @@ static void sessionpoolClear(xsessionpool * o)
         o->size = o->size - 1;
         xsessionDel(session);
     }
-
-    xfunctionAssert(o->head || o->tail || o->size, "head => %p, tail => %p, size => %ld", o->head, o->tail, o->size);
     xsyncUnlock(o->sync);
 }
