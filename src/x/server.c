@@ -6,14 +6,21 @@
 
 static xserver * serverDel(xserver * o);
 static xint32 serverOpen(xserver * o);
+static xint64 serverRead(xserver * o);
+static xint64 serverWrite(xserver * o);
 static xint32 serverClose(xserver * o);
+static xint32 serverShutdown(xserver * o, xint32 how);
+
 static xsession * serverAccept(xserver * o);
 static void serverRel(xserver * o, xsession * session);
 
 static xserverset virtualSet = {
     serverDel,
     serverOpen,
+    serverRead,
+    serverWrite,
     serverClose,
+    serverShutdown,
     serverAccept,
     serverRel
 };
@@ -49,9 +56,24 @@ static xint32 serverOpen(xserver * o)
     return xserversocketOpen(o->socket);
 }
 
+static xint64 serverRead(xserver * o)
+{
+    return xserversocketRead(o->socket);
+}
+
+static xint64 serverWrite(xserver * o)
+{
+    return xserversocketWrite(o->socket);
+}
+
 static xint32 serverClose(xserver * o)
 {
     return xserversocketClose(o->socket);
+}
+
+static xint32 serverShutdown(xserver * o, xint32 how)
+{
+    return xserversocketShutdown(o->socket, how);
 }
 
 static xsession * serverAccept(xserver * o)

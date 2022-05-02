@@ -33,7 +33,10 @@ struct xserverset
 {
     xserver * (*del)(xserver *);
     xint32 (*open)(xserver *);
+    xint64 (*read)(xserver *);
+    xint64 (*write)(xserver *);
     xint32 (*close)(xserver *);
+    xint32 (*shutdown)(xserver *, xint32);
     xsession * (*accept)(xserver *);
     void (*release)(xserver *, xsession *);
 };
@@ -42,7 +45,10 @@ extern xserver * xserverNew(xint32 domain, xint32 type, xint32 protocol, const v
 
 #define xserverDel(o)           (o->set->del(o))
 #define xserverOpen(o)          (o->set->open(o))
+#define xserverRead(o)          (o->set->read(o))
+#define xserverWrite(o)         (o->set->write(o))
 #define xserverClose(o)         (o->set->close(o))
+#define xserverShutdown(o, how) (o->set->shutdown(o, how))
 #define xserverAccept(o)        (o->set->accept(o))
 #define xserverRel(o, session)  (o->set->release(o, session))
 
