@@ -10,6 +10,7 @@ static xint32 clientOpen(xclient * o);
 static xint64 clientRead(xclient * o);
 static xint64 clientWrite(xclient * o);
 static xint32 clientClose(xclient * o);
+static xint32 clientShutdown(xclient * o, xint32 how);
 static xint32 clientConnect(xclient * o);
 static xint64 clientSend(xclient * o, const unsigned char * message, xuint64 length);
 static xint64 clientRecv(xclient * o, unsigned char * buffer, xuint64 length);
@@ -20,6 +21,7 @@ static xclientset virtualSet = {
     clientRead,
     clientWrite,
     clientClose,
+    clientShutdown,
     clientConnect,
     clientSend,
     clientRecv
@@ -64,6 +66,11 @@ static xint64 clientWrite(xclient * o)
 static xint32 clientClose(xclient * o)
 {
     return xclientsocketClose(o->socket);
+}
+
+static xint32 clientShutdown(xclient * o, xint32 how)
+{
+    return xclientsocketShutdown(o->socket, how);
 }
 
 static xint32 clientConnect(xclient * o)

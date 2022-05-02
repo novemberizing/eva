@@ -23,6 +23,7 @@ struct xclientset
     xint64 (*read)(xclient *);
     xint64 (*write)(xclient *);
     xint32 (*close)(xclient *);
+    xint32 (*shutdown)(xclient *, xint32);
     xint32 (*connect)(xclient *);
     xint64 (*send)(xclient *, const unsigned char *, xuint64);
     xint64 (*recv)(xclient *, unsigned char *, xuint64);
@@ -35,6 +36,7 @@ extern xclient * xclientNew(xint32 domain, xint32 type, xint32 protocol, const v
 #define xclientRead(o)                      (o->set->read(o))
 #define xclientWrite(o)                     (o->set->write(o))
 #define xclientClose(o)                     (o->set->close(o))
+#define xclientShutdown(o, how)             (o->set->shutdown(o, how))
 #define xclientConnect(o)                   (o->set->connect(o))
 #define xclientSend(o, message, length)     (o->set->send(o, message, length))
 #define xclientRecv(o, buffer, length)      (o->set->recv(o, buffer, length))
