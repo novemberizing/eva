@@ -15,27 +15,27 @@ static xint64 serversocketRead(xserversocket * o);
 static xint64 serversocketWrite(xserversocket * o);
 static xint32 serversocketClose(xserversocket * o);
 static xint32 serversocketShutdown(xserversocket * o, xint32 how);
-static void serversocketPush(xserversocket * o, xsessionsocket * sessionsocket);
-static void serversocketRem(xserversocket * o, xsessionsocket * sessionsocket);
-static void serversocketClear(xserversocket * o);
 static xsessionsocket * serversocketAccept(xserversocket * o);
 static void serversocketRel(xserversocket * o, xsessionsocket * sessionsocket);
 
 static xserversocketset virtualSet = {
     serversocketDel,
+
     serversocketOpen,
     serversocketRead,
     serversocketWrite,
     serversocketClose,
     serversocketShutdown,
-    serversocketPush,
-    serversocketRem,
-    serversocketClear,
+
     serversocketAccept,
     serversocketRel
 };
 
-extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen)
+static void serversocketPush(xserversocket * o, xsessionsocket * sessionsocket);
+static void serversocketRem(xserversocket * o, xsessionsocket * sessionsocket);
+static void serversocketClear(xserversocket * o);
+
+extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addresslen)
 {
     xserversocket * o = (xserversocket *) xsocketNew(value, (xsocketset *) xaddressof(virtualSet), sizeof(xserversocket));
 
@@ -43,10 +43,7 @@ extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type
     o->type = type;
     o->protocol = protocol;
 
-    o->address.length = addressLen;
-    o->address.value = malloc(o->address.length);
-
-    memcpy(o->address.value, address, o->address.length);
+    xobjectSet(xaddressof(o->address), address, addresslen);
 
     o->sessionsocketpool = xsessionsocketpoolNew(1024, o);
 
@@ -60,9 +57,11 @@ static xserversocket * serversocketDel(xserversocket * o)
         serversocketShutdown(o, xserversocketshutdown_all);
         serversocketClose(o);
 
-        o->sync = xsyncDel(o->sync);
-        o->address.value = xobjectDel(o->address.value);
+        serversocketClear(o);
         o->sessionsocketpool = xsessionsocketpoolDel(o->sessionsocketpool);
+
+        o->sync = xsyncDel(o->sync);
+        xobjectSet(xaddressof(o->address), xnil, 0);
 
         free(o);
     }
@@ -160,20 +159,25 @@ static xint32 serversocketShutdown(xserversocket * o, xint32 how)
 static void serversocketPush(xserversocket * o, xsessionsocket * sessionsocket)
 {
     xsyncLock(o->sync);
-    sessionsocket->serversocket.prev = o->tail;
+
+    sessionsocket->parent.prev = o->tail;
     
-    if(sessionsocket->serversocket.prev)
+    if(sessionsocket->parent.prev)
     {
-        sessionsocket->serversocket.prev->serversocket.next = sessionsocket;
+        sessionsocket->parent.prev->parent.next = sessionsocket;
     }
     else
     {
         o->head = sessionsocket;
     }
 
+    sessionsocket->parent.serversocket = o;
+
     o->tail = sessionsocket;
     o->size = o->size + 1;
     xsyncUnlock(o->sync);
+
+    xfunctionAssert(sessionsocket->parent.next, "");
 }
 
 static void serversocketRem(xserversocket * o, xsessionsocket * sessionsocket)
@@ -181,26 +185,27 @@ static void serversocketRem(xserversocket * o, xsessionsocket * sessionsocket)
     if(o)
     {
         xsyncLock(o->sync);
-        xsessionsocket * prev = sessionsocket->serversocket.prev;
-        xsessionsocket * next = sessionsocket->serversocket.next;
-        if(sessionsocket->serversocket.prev)
+        xsessionsocket * prev = sessionsocket->parent.prev;
+        xsessionsocket * next = sessionsocket->parent.next;
+        if(sessionsocket->parent.prev)
         {
-            prev->serversocket.next = next;
-            sessionsocket->serversocket.prev = xnil;
+            prev->parent.next = next;
+            sessionsocket->parent.prev = xnil;
         }
         else
         {
-            o->head = sessionsocket;
+            o->head = next;
         }
         if(next)
         {
-            next->serversocket.prev = prev;
-            sessionsocket->serversocket.next = xnil;
+            next->parent.prev = prev;
+            sessionsocket->parent.next = xnil;
         }
         else
         {
-            o->tail = sessionsocket;
+            o->tail = prev;
         }
+        sessionsocket->parent.serversocket = xnil;
         o->size = o->size - 1;
         xsyncUnlock(o->sync);
     }
@@ -209,23 +214,27 @@ static void serversocketClear(xserversocket * o)
 {
     xsyncLock(o->sync);
     xsessionsocket * node = xnil;
-    do {
+    while(o->head)
+    {
+        xfunctionAssert(o->head->parent.sessionsocketpool, "");
         node = o->head;
 
-        if(node)
+        o->head = node->parent.next;
+
+        if(o->head)
         {
-            o->head = node->serversocket.next;
-            o->head->serversocket.prev = xnil;
-            node->serversocket.next = xnil;
+            node->parent.next = xnil;
         }
         else
         {
             o->tail = xnil;
         }
         o->size = o->size - 1;
+        node->parent.serversocket = xnil;
+        xfunctionAssert(node->parent.sessionsocketpool, "");
 
         xsessionsocketpoolPush(o->sessionsocketpool, node);
-    } while(o->head);
+    }
     xsyncUnlock(o->sync);
 }
 
@@ -243,10 +252,11 @@ static xsessionsocket * serversocketAccept(xserversocket * o)
         {
             sessionsocket = xsessionsocketpoolGet(o->sessionsocketpool);
 
+            xfunctionAssert(sessionsocket->parent.sessionsocketpool, "");
+
             sessionsocket->value = value;
-            sessionsocket->address.length = addrlen;
-            sessionsocket->address.value = malloc(sessionsocket->address.length);
-            memcpy(sessionsocket->address.value, xaddressof(addr), sessionsocket->address.length);
+
+            xobjectSet(xaddressof(sessionsocket->address), xaddressof(addr), addrlen);
 
             serversocketPush(o, sessionsocket);
 
@@ -260,6 +270,7 @@ static xsessionsocket * serversocketAccept(xserversocket * o)
 static void serversocketRel(xserversocket * o, xsessionsocket * sessionsocket)
 {
     serversocketRem(o, sessionsocket);
+
     xsessionsocketpoolRel(o->sessionsocketpool, sessionsocket);
 
     xfunctionInfo("server size => %ld", o->size);

@@ -66,6 +66,4 @@ typedef __UINT64_TYPE__     xuint64;
     printf("[verbose:%s:%d %s:%ld] " format "\n", __FILE__, __LINE__, __func__, pthread_self(), ##__VA_ARGS__);                         \
 } while(0)
 
-extern void * xobjectDel(void * o);
-
 #endif // __NOVEMBERIZING_X__STD__H__

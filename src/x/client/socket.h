@@ -3,6 +3,7 @@
 
 #include <x/socket.h>
 #include <x/stream.h>
+#include <x/object.h>
 
 #define xclientsocket_invalid_value xsocket_invalud_value
 
@@ -38,10 +39,7 @@ struct xclientsocket
     xint32 type;
     xint32 protocol;
 
-    struct {
-        xuint64 length;
-        void * value;
-    } address;
+    xobject address;
 
     struct {
         xstream * in;
@@ -62,7 +60,7 @@ struct xclientsocketset
     xint64 (*recv)(xclientsocket *, unsigned char *, xuint64);
 };
 
-extern xclientsocket * xclientsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen);
+extern xclientsocket * xclientsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addresslen);
 
 #define xclientsocketDel(o)                     (o->set->del(o))
 #define xclientsocketOpen(o)                    (o->set->open(o))

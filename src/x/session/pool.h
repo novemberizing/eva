@@ -29,13 +29,13 @@ struct xsessionpoolset
 {
     xsessionpool * (*del)(xsessionpool *);
     xsession * (*get)(xsessionpool *, xsessionsocket *);
-    void (*release)(xsessionpool *, xsession *);
+    void (*rel)(xsessionpool *, xsession *);
 };
 
 extern xsessionpool * xsessionpoolNew(xuint64 capacity);
 
 #define xsessionpoolDel(o)                      (o->set->del(o))
 #define xsessionpoolGet(o, sessionsocket)       (o->set->get(o, sessionsocket))
-#define xsessionpoolRel(o, session)             (o->set->release(o, session))
+#define xsessionpoolRel(o, session)             (o->set->rel(o, session))
 
 #endif // __NOVEMBERIZING_X_SESSION__POOL__H__

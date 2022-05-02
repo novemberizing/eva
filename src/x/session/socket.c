@@ -42,13 +42,15 @@ static xsessionsocket * sessionsocketDel(xsessionsocket * o)
         sessionsocketShutdown(o, xsessionsocketshutdown_all);
         sessionsocketClose(o);
 
-        if(o->sessionsocketpool.container) xsessionsocketpoolRem(o->sessionsocketpool.container, o);
-        if(o->serversocket.container) xserversocketRem(o->serversocket.container, o);
+        if(o->parent.serversocket) xserversocketRel(o->parent.serversocket, o);
+        if(o->parent.sessionsocketpool) xsessionsocketpoolRem(o->parent.sessionsocketpool, o);
 
         o->sync = xsyncDel(o->sync);
+
         o->stream.in = xstreamDel(o->stream.in);
         o->stream.out = xstreamDel(o->stream.out);
-        o->address.value = xobjectDel(o->address.value);
+
+        xobjectSet(xaddressof(o->address), xnil, 0);
 
         free(o);
     }

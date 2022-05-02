@@ -32,7 +32,7 @@ static xclientsocketset virtualSet = {
     clientsocketRecv
 };
 
-extern xclientsocket * xclientsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen)
+extern xclientsocket * xclientsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addresslen)
 {
     xclientsocket * o = (xclientsocket *) xsocketNew(value, (xsocketset *) xaddressof(virtualSet), sizeof(xclientsocket));
 
@@ -40,9 +40,8 @@ extern xclientsocket * xclientsocketNew(xint32 value, xint32 domain, xint32 type
     o->type = type;
     o->protocol = protocol;
 
-    o->address.length = addressLen;
-    o->address.value = o->address.length > 0 ? malloc(o->address.length) : xnil;
-    memcpy(o->address.value, address, o->address.length);
+    xobjectSet(xaddressof(o->address), address, addresslen);
+
     o->stream.in = xstreamNew(0, 0);
     o->stream.out = xstreamNew(0, 0);
 
@@ -58,7 +57,8 @@ static xclientsocket * clientsocketDel(xclientsocket * o)
         o->sync = xsyncDel(o->sync);
         o->stream.in = xstreamDel(o->stream.in);
         o->stream.out = xstreamDel(o->stream.out);
-        o->address.value = xobjectDel(o->address.value);
+
+        xobjectSet(xaddressof(o->address), xnil, 0);
 
         free(o);
 

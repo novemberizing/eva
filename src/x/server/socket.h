@@ -2,6 +2,7 @@
 #define   __NOVEMBERIZING_X_SERVER__SOCKET__H__
 
 #include <x/socket.h>
+#include <x/object.h>
 #include <x/session/socket/pool.h>
 
 struct xsessionsocket;
@@ -45,10 +46,7 @@ struct xserversocket
     xint32 type;
     xint32 protocol;
 
-    struct {
-        xuint64 length;
-        void * value;
-    } address;
+    xobject address;
 
     xsessionsocketpool * sessionsocketpool;
 
@@ -60,19 +58,18 @@ struct xserversocket
 struct xserversocketset
 {
     xserversocket * (*del)(xserversocket *);
+
     xint32 (*open)(xserversocket *);
     xint64 (*read)(xserversocket *);
     xint64 (*write)(xserversocket *);
     xint32 (*close)(xserversocket *);
     xint32 (*shutdown)(xserversocket *, xint32);
-    void (*push)(xserversocket *, xsessionsocket *);
-    void (*rem)(xserversocket *, xsessionsocket *);
-    void (*clear)(xserversocket *);
+
     xsessionsocket * (*accept)(xserversocket *);
     void (*release)(xserversocket *, xsessionsocket *);
 };
 
-extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addressLen);
+extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addresslen);
 
 #define xserversocketDel(o)                     (o->set->del(o))
 #define xserversocketOpen(o)                    (o->set->open(o))
@@ -80,9 +77,6 @@ extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type
 #define xserversocketWrite(o)                   (o->set->write(o))
 #define xserversocketClose(o)                   (o->set->close(o))
 #define xserversocketShutdown(o, how)           (o->set->shutdown(o, how))
-#define xserversocketPush(o, sessionsocket)     (o->set->push(o, sessionsocket))
-#define xserversocketRem(o, sessionsocket)      (o->set->rem(o, sessionsocket))
-#define xserversocketClear(o)                   (o->set->clear(o))
 #define xserversocketAccept(o)                  (o->set->accept(o))
 #define xserversocketRel(o, sessionsocket)      (o->set->release(o, sessionsocket))
 

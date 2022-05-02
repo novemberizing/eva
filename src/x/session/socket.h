@@ -5,6 +5,7 @@
 #include <x/server/socket.h>
 #include <x/session/socket/pool.h>
 #include <x/stream.h>
+#include <x/object.h>
 
 struct xserversocket;
 struct xsessionsocketpool;
@@ -46,10 +47,7 @@ struct xsessionsocket
     xint32 type;
     xint32 protocol;
 
-    struct {
-        xuint64 length;
-        void * value;
-    } address;
+    xobject address;
 
     struct {
         xstream * in;
@@ -57,21 +55,17 @@ struct xsessionsocket
     } stream;
 
     struct {
-        xsessionsocketpool * container;
+        xsessionsocketpool * sessionsocketpool;
+        xserversocket * serversocket;
         xsessionsocket * prev;
         xsessionsocket * next;
-    } sessionsocketpool;
-
-    struct {
-        xserversocket * container;
-        xsessionsocket * prev;
-        xsessionsocket * next;
-    } serversocket;
+    } parent;
 };
 
 struct xsessionsocketset
 {
     xsessionsocket * (*del)(xsessionsocket *);
+
     xint32 (*open)(xsessionsocket *);
     xint64 (*read)(xsessionsocket *);
     xint64 (*write)(xsessionsocket *);

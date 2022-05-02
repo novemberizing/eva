@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <pthread.h>
 
 #include "pool.h"
 
@@ -49,19 +50,20 @@ static xsessionsocketpool * sessionsocketpoolDel(xsessionsocketpool * o)
 
 static void sessionsocketpoolPush(xsessionsocketpool * o, xsessionsocket * sessionsocket)
 {
+    xfunctionAssert(sessionsocket->parent.serversocket || sessionsocket->parent.sessionsocketpool || sessionsocket->parent.serversocket, "invalid parameter");
     xsyncLock(o->sync);
 
-    sessionsocket->sessionsocketpool.prev = o->tail;
+    sessionsocket->parent.prev = o->tail;
 
-    if(sessionsocket->sessionsocketpool.prev)
+    if(sessionsocket->parent.prev)
     {
-        sessionsocket->sessionsocketpool.prev->sessionsocketpool.next = sessionsocket;
+        sessionsocket->parent.prev->parent.next = sessionsocket;
     }
     else
     {
         o->head = sessionsocket;
     }
-    sessionsocket->sessionsocketpool.container = o;
+    sessionsocket->parent.sessionsocketpool = o;
 
     o->tail = sessionsocket;
     o->size = o->size + 1;
@@ -76,12 +78,12 @@ static xsessionsocket * sessionsocketpoolPop(xsessionsocketpool * o)
 
     if(sessionsocket)
     {
-        o->head = sessionsocket->sessionsocketpool.next;
+        o->head = sessionsocket->parent.next;
 
         if(o->head)
         {
-            o->head->sessionsocketpool.prev = xnil;
-            sessionsocket->sessionsocketpool.next = xnil;
+            o->head->parent.prev = xnil;
+            sessionsocket->parent.next = xnil;
         }
         else
         {
@@ -89,7 +91,7 @@ static xsessionsocket * sessionsocketpoolPop(xsessionsocketpool * o)
         }
 
         o->size = o->size - 1;
-        sessionsocket->sessionsocketpool.container = xnil;
+        sessionsocket->parent.sessionsocketpool = xnil;
     }
 
     xsyncUnlock(o->sync);
@@ -98,17 +100,18 @@ static xsessionsocket * sessionsocketpoolPop(xsessionsocketpool * o)
 
 static void sessionsocketpoolRem(xsessionsocketpool * o, xsessionsocket * sessionsocket)
 {
+    xfunctionAssert(o == xnil || sessionsocket->parent.sessionsocketpool != o || sessionsocket->parent.serversocket, "invalid parameter");
     if(o)
     {
         xsyncLock(o->sync);
 
-        xsessionsocket * prev = sessionsocket->sessionsocketpool.prev;
-        xsessionsocket * next = sessionsocket->sessionsocketpool.next;
+        xsessionsocket * prev = sessionsocket->parent.prev;
+        xsessionsocket * next = sessionsocket->parent.next;
 
         if(prev)
         {
-            prev->sessionsocketpool.next = next;
-            sessionsocket->sessionsocketpool.prev = xnil;
+            prev->parent.next = next;
+            sessionsocket->parent.prev = xnil;
         }
         else
         {
@@ -117,15 +120,15 @@ static void sessionsocketpoolRem(xsessionsocketpool * o, xsessionsocket * sessio
 
         if(next)
         {
-            next->sessionsocketpool.prev = prev;
-            sessionsocket->sessionsocketpool.next = xnil;
+            next->parent.prev = prev;
+            sessionsocket->parent.next = xnil;
         }
         else
         {
             o->tail = prev;
         }
         o->size = o->size - 1;
-        sessionsocket->sessionsocketpool.container = xnil;
+        sessionsocket->parent.sessionsocketpool = xnil;
 
 
         xsyncUnlock(o->sync);
@@ -137,23 +140,24 @@ static void sessionsocketpoolClear(xsessionsocketpool * o)
     xsyncLock(o->sync);
     xsessionsocket * node = xnil;
 
-    do {
+    while(o->head)
+    {
         node = o->head;
 
-        o->head = node->sessionsocketpool.next;
+        o->head = node->parent.next;
         if(o->head)
         {
-            o->head->sessionsocketpool.prev = xnil;
+            o->head->parent.prev = xnil;
         }
         else
         {
             o->tail = xnil;
         }
         o->size = o->size - 1;
-        node->sessionsocketpool.container = xnil;
-        node->sessionsocketpool.next = xnil;
+        node->parent.sessionsocketpool = xnil;
+        node->parent.next = xnil;
         xsessionsocketDel(node);
-    } while(o->head);
+    }
 
     xsyncUnlock(o->sync);
 }
@@ -164,6 +168,10 @@ static xsessionsocket * sessionsocketpoolGet(xsessionsocketpool * o)
     if(sessionsocket == xnil)
     {
         sessionsocket = xsessionsocketNew(xsessionsocket_invalid_value);
+    }
+    else
+    {
+        xfunctionAssert(sessionsocket->parent.next, "");
     }
     return sessionsocket;
 }

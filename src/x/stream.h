@@ -17,7 +17,6 @@ struct xstream
     xuint64 position;
     xuint64 size;
     xuint64 capacity;
-    xuint64 page;                   // 필요해보이지 않는다.
 };
 
 struct xstreamset

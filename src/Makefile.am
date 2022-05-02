@@ -5,6 +5,7 @@ ACLOCAL_AMFLAGS = -I m4
 lib_LIBRARIES = libnovemberizing.a
 
 libnovemberizing_a_SOURCES = x/std.c                                  \
+                             x/object.c                               \
                              x/sync.c                                 \
                              x/stream.c                               \
                              x/sync/mutex.c                           \
@@ -24,6 +25,7 @@ LIBS = libnovemberizing.a                                             \
        -lpthread
 
 nobase_include_HEADERS = x/std.h                                      \
+                         x/object.h                                   \
                          x/sync.h                                     \
                          x/stream.h                                   \
                          x/descriptor.h                               \
