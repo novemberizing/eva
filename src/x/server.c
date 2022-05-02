@@ -107,10 +107,10 @@ static void serverRel(xserver * o, xsession * session)
 static void serverPush(xserver * o, xsession * session)
 {
     xsyncLock(o->sync);
-    session->server.prev = o->tail;
-    if(session->server.prev)
+    session->parent.prev = o->tail;
+    if(session->parent.prev)
     {
-        session->server.prev->server.next = session;
+        session->parent.prev->parent.next = session;
     }
     else
     {
@@ -118,19 +118,19 @@ static void serverPush(xserver * o, xsession * session)
     }
     o->tail = session;
     o->size = o->size + 1;
-    session->server.container = o;
+    session->parent.server = o;
     xsyncUnlock(o->sync);
 }
 
 static void serverRem(xserver * o, xsession * session)
 {
     xsyncLock(o->sync);
-    xsession * prev = session->server.prev;
-    xsession * next = session->server.next;
+    xsession * prev = session->parent.prev;
+    xsession * next = session->parent.next;
 
     if(prev)
     {
-        prev->server.next = next;
+        prev->parent.next = next;
     }
     else
     {
@@ -139,14 +139,14 @@ static void serverRem(xserver * o, xsession * session)
 
     if(next)
     {
-        next->server.prev = prev;
+        next->parent.prev = prev;
     }
     else
     {
         o->tail = prev;
     }
     o->size = o->size - 1;
-    session->server.container = xnil;
+    session->parent.server = xnil;
 
     xsyncUnlock(o->sync);
 }
