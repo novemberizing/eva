@@ -19,7 +19,20 @@ extern xint32 xeventengineRun(xeventengine * o)
 {
     while(o->cancel == xnil)
     {
+        xcommandeventgeneratorOn(o->generator.command);
 
+        xeventqueueLock(o->queue);
+        xuint64 size = o->queue->size;
+        for(xuint64 i = 0; i < size && o->queue->size > 0; i++)
+        {
+            xevent * event = xeventqueuePop(o->queue);
+            xeventqueueUnlock(o->queue);
+            event->subscription->on(event->object, event->type, event->subscription);
+            xeventRel(event);
+            xeventqueueLock(o->queue);
+        }
+        xeventqueueUnlock(o->queue);
+        // xdescriptoreventgeneratorOn(o->generator.descriptor);
     }
     o = eventengineDel(o);
     return xsuccess;
@@ -41,7 +54,7 @@ static xeventengine * eventengineDel(xeventengine * o)
 
 extern xeventsubscription * xeventengineRegisterDescriptor(xeventengine * o, xdescriptor * descriptor, xdescriptoreventhandler on)
 {
-    xeventsubscription * subscription = xeventsubscriptionNew(o, (xeventobject *) descriptor, (xeventhandler) on);
+    xeventsubscription * subscription = xeventsubscriptionNew((xeventobject *) descriptor, o, (xeventhandler) on);
 
     xdescriptoreventgeneratorRegisterSubscription(o->generator.descriptor, subscription);
 

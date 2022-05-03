@@ -19,7 +19,8 @@ libnovemberizing_a_SOURCES = x/std.c                                  \
                              x/server.c                               \
                              x/session.c                              \
                              x/session/pool.c                         \
-                             x/event/engine.c
+                             x/event/engine.c                         \
+                             x/event/generator.c
 
 LIBS = libnovemberizing.a                                             \
        -lpthread
@@ -38,7 +39,8 @@ nobase_include_HEADERS = x/std.h                                      \
                          x/server.h                                   \
                          x/session.h                                  \
                          x/session/pool.h                             \
-                         x/event/engine.h
+                         x/event/engine.h                             \
+                         x/event/generator.h
 
 noinst_PROGRAMS = ExampleSync                                         \
                   ExampleClientSocket                                 \

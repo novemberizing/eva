@@ -4,7 +4,10 @@
 #include <x/std.h>
 #include <x/descriptor.h>
 
+#include <x/event/queue.h>
+
 #include <x/descriptor/event/generator.h>
+#include <x/command/event/generator.h>
 
 struct xeventengine;
 typedef struct xeventengine xeventengine;
@@ -21,7 +24,10 @@ struct xeventengine
 
     struct {
         xdescriptoreventgenerator * descriptor;
+        xcommandeventgenerator * command;
     } generator;
+
+    xeventqueue * queue;
 };
 
 extern xeventengine * xeventengineGen(void);

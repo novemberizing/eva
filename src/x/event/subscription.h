@@ -6,13 +6,12 @@
 struct xeventsubscription;
 typedef struct xeventsubscription xeventsubscription;
 
-typedef void (*xeventhandler)(xeventobject *, xeventengine *, xuint32);
 
 struct xeventsubscription
 {
     xeventobject * object;
 
-    void (*on)(xeventobject *, xuint32);
+    void (*on)(xeventobject *, xuint32, xeventsubscription *);
 
     struct {
         xeventengine * engine;
