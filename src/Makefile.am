@@ -20,7 +20,10 @@ libnovemberizing_a_SOURCES = x/std.c                                  \
                              x/session.c                              \
                              x/session/pool.c                         \
                              x/event/engine.c                         \
-                             x/event/generator.c
+                             x/event/engine/wait.c                    \
+                             x/event/generator.c                      \
+                             x/event/subscription.c                   \
+                             x/command.c
 
 LIBS = libnovemberizing.a                                             \
        -lpthread
@@ -40,7 +43,10 @@ nobase_include_HEADERS = x/std.h                                      \
                          x/session.h                                  \
                          x/session/pool.h                             \
                          x/event/engine.h                             \
-                         x/event/generator.h
+                         x/event/engine/wait.h                        \
+                         x/event/generator.h                          \
+                         x/event/subscription.h                       \
+                         x/command.h
 
 noinst_PROGRAMS = ExampleSync                                         \
                   ExampleClientSocket                                 \
@@ -51,7 +57,11 @@ noinst_PROGRAMS = ExampleSync                                         \
                   ExampleServerSocketNonblock                         \
                   ExampleServer                                       \
                   ExampleServerNonblock                               \
-                  ExampleEventEngine
+                  ExampleEventEngine                                  \
+                  ExampleCommand
+
+ExampleCommand_SOURCES = example/ExampleCommand.c
+ExampleCommand_LDADD = $(LIBS)
 
 ExampleEventEngine_SOURCES = example/ExampleEventEngine.c
 ExampleEventEngine_LDADD = $(LIBS)

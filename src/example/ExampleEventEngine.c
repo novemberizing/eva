@@ -2,7 +2,5 @@
 
 int main(int argc, char ** argv)
 {
-    // xeventengineGet();
-    // return xeventengineRun();
     return 0;
 }

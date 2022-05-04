@@ -4,26 +4,30 @@
 #include <x/event.h>
 
 struct xeventsubscription;
-typedef struct xeventsubscription xeventsubscription;
+struct xeventsubscriptionset;
 
+typedef struct xeventsubscription xeventsubscription;
+typedef struct xeventsubscriptionset xeventsubscriptionset;
 
 struct xeventsubscription
 {
+    const xeventsubscriptionset * set;
+
+    xeventsubscription * prev;
+    xeventsubscription * next;
+    xeventgenerator * generator;
+    xeventengine * engine;
+
     xeventobject * object;
 
-    void (*on)(xeventobject *, xuint32, xeventsubscription *);
-
-    struct {
-        xeventengine * engine;
-        xeventgenerator * generator;
-
-        xeventsubscription * prev;
-        xeventsubscription * next;
-    } parent;
-
-    
+    xeventhandler on;
 };
 
-extern xeventsubscription * xeventsubscriptionNew(xeventobject * object, xeventengine * engine, xeventhandler on);
+struct xeventsubscriptionset
+{
+    xeventsubscription * (*del)(xeventsubscription *);
+};
+
+extern xeventsubscription * xeventsubscriptionNew(void);
 
 #endif // __NOVEMBERIZING_X_EVENT__SUBSCRIPTION__H__

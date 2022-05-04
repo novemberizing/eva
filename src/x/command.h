@@ -1,12 +1,7 @@
 #ifndef   __NOVEMBERIZING_X__COMMAND__H__
 #define   __NOVEMBERIZING_X__COMMAND__H__
 
-#include <x/std.h>
-
-struct xeventengine;
-struct xeventsubscription;
-typedef struct xeventengine xeventengine;
-typedef struct xeventsubscription xeventsubscription;
+#include <x/event.h>
 
 struct xcommand;
 struct xcommandset;
@@ -14,20 +9,17 @@ struct xcommandset;
 typedef struct xcommand xcommand;
 typedef struct xcommandset xcommandset;
 
+struct xcommandeventgenerator;
+struct xcommandeventsubscription;
+
+typedef struct xcommandeventgenerator xcommandeventgenerator;
+typedef struct xcommandeventsubscription xcommandeventsubscription;
+
 typedef void (*xcommandexec)(xcommand *);
 
 struct xcommand
 {
     const xcommandset * set;
-
-    
-
-    struct {
-        xeventengine * engine;
-        
-        xeventsubscription * prev;
-        xeventsubscription * next;
-    } subscription;
 
     xcommandexec exec;
 };
@@ -39,8 +31,10 @@ struct xcommandset
 
 extern xcommand * xcommandNew(xcommandexec exec, const xcommandset * set, xuint64 size);
 
-#define xcommandDel(o)      (o->set->del(o))
+#define xcommandDel(o)          (o->set->del(o))
 
-#define xcommandExec(o)     (o->set->exec(o))
+#define xcommandExec(o)         (o->exec(o))
+
+extern const xcommandset * xcommandsetGet(void);
 
 #endif // __NOVEMBERIZING_X__COMMAND__H__
