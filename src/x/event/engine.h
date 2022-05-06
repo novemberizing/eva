@@ -5,6 +5,7 @@
 #include <x/event/engine/wait.h>
 
 #include <x/command/event/generator.h>
+#include <x/descriptor/event/generator.h>
 
 struct xeventengine;
 
@@ -26,6 +27,7 @@ struct xeventengine
 
     struct {
         xcommandeventgenerator * command;
+        xdescriptoreventgenerator * descriptor;
     } generator;
 };
 
@@ -41,5 +43,8 @@ extern void xeventengineSubscriptionPush(xeventengine * o, xeventsubscription * 
 
 extern xcommandeventsubscription * xeventengineCommandReg(xeventengine * o, xcommand * command, xcommandeventhandler on);
 extern xcommandeventsubscription * xeventengineCommandEventSubscriptionUnreg(xeventengine * o, xcommandeventsubscription * subscription);
+
+extern xdescriptoreventsubscription * xeventengineDescriptorReg(xeventengine * o, xdescriptor * descriptor, xdescriptoreventhandler on);
+extern xdescriptoreventsubscription * xeventengineDescriptorEventSubscriptionUnreg(xeventengine * o, xdescriptoreventsubscription * subscription);
 
 #endif // __NOVEMBERIZING_X_EVENT__ENGINE__H__

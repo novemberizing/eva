@@ -5,6 +5,7 @@
 #include "server.h"
 
 static xserver * serverDel(xserver * o);
+static xint32 serverVal(xserver * o);
 static xint32 serverOpen(xserver * o);
 static xint64 serverRead(xserver * o);
 static xint64 serverWrite(xserver * o);
@@ -16,6 +17,7 @@ static void serverRel(xserver * o, xsession * session);
 
 static xserverset virtualSet = {
     serverDel,
+    serverVal,
     serverOpen,
     serverRead,
     serverWrite,
@@ -49,6 +51,11 @@ static xserver * serverDel(xserver * o)
         free(o);
     }
     return xnil;
+}
+
+static xint32 serverVal(xserver * o)
+{
+    return xserversocketVal(o->socket);
 }
 
 static xint32 serverOpen(xserver * o)

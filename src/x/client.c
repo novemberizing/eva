@@ -6,6 +6,7 @@
 #include "client/socket.h"
 
 static xclient * clientDel(xclient * o);
+static xint32 clientVal(xclient * o);
 static xint32 clientOpen(xclient * o);
 static xint64 clientRead(xclient * o);
 static xint64 clientWrite(xclient * o);
@@ -17,6 +18,7 @@ static xint64 clientRecv(xclient * o, unsigned char * buffer, xuint64 length);
 
 static xclientset virtualSet = {
     clientDel,
+    clientVal,
     clientOpen,
     clientRead,
     clientWrite,
@@ -46,6 +48,11 @@ static xclient * clientDel(xclient * o)
         free(o);
     }
     return xnil;
+}
+
+static xint32 clientVal(xclient * o)
+{
+    return xclientsocketVal(o->socket);
 }
 
 static xint32 clientOpen(xclient * o)

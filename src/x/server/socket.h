@@ -20,12 +20,21 @@ typedef struct xsessionsocketpool xsessionsocketpool;
 #define xserversocketshutdown_out       xsocketshutdown_out
 #define xserversocketshutdown_all       xsocketshutdown_all
 
+#define xserversocketevent_none         xsocketevent_none
 #define xserversocketevent_open         xsocketevent_open
 #define xserversocketevent_in           xsocketevent_in
 #define xserversocketevent_out          xsocketevent_out
 #define xserversocketevent_close        xsocketevent_close
 #define xserversocketevent_connect      xsocketevent_open
 #define xserversocketevent_error        xsocketevent_error
+
+#define xserversocketstatus_none        xsocketstatus_none
+#define xserversocketstatus_open        xsocketstatus_open
+#define xserversocketstatus_in          xsocketstatus_in
+#define xserversocketstatus_out         xsocketstatus_out
+#define xserversocketstatus_close       xsocketstatus_close
+#define xserversocketstatus_connect     xsocketstatus_open
+#define xserversocketstatus_error       xsocketstatus_error
 
 struct xserversocket;
 struct xserversocketset;
@@ -58,11 +67,12 @@ struct xserversocket
 struct xserversocketset
 {
     xserversocket * (*del)(xserversocket *);
-
+    xint32 (*val)(xserversocket *);
     xint32 (*open)(xserversocket *);
     xint64 (*read)(xserversocket *);
     xint64 (*write)(xserversocket *);
     xint32 (*close)(xserversocket *);
+    xuint32 (*interest)(xserversocket *);
     xint32 (*shutdown)(xserversocket *, xint32);
 
     xsessionsocket * (*accept)(xserversocket *);
@@ -72,10 +82,12 @@ struct xserversocketset
 extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addresslen);
 
 #define xserversocketDel(o)                     (o->set->del(o))
+#define xserversocketVal(o)                     (o->set->val(o))
 #define xserversocketOpen(o)                    (o->set->open(o))
 #define xserversocketRead(o)                    (o->set->read(o))
 #define xserversocketWrite(o)                   (o->set->write(o))
 #define xserversocketClose(o)                   (o->set->close(o))
+#define xserversocketInterest(o)                (o->set->interest(o))
 #define xserversocketShutdown(o, how)           (o->set->shutdown(o, how))
 #define xserversocketAccept(o)                  (o->set->accept(o))
 #define xserversocketRel(o, sessionsocket)      (o->set->release(o, sessionsocket))

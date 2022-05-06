@@ -10,23 +10,25 @@
 #include "socket.h"
 
 static xserversocket * serversocketDel(xserversocket * o);
+static xint32 serversocketVal(xserversocket * o);
 static xint32 serversocketOpen(xserversocket * o);
 static xint64 serversocketRead(xserversocket * o);
 static xint64 serversocketWrite(xserversocket * o);
 static xint32 serversocketClose(xserversocket * o);
+static xuint32 serversocketInterest(xserversocket * o);
 static xint32 serversocketShutdown(xserversocket * o, xint32 how);
 static xsessionsocket * serversocketAccept(xserversocket * o);
 static void serversocketRel(xserversocket * o, xsessionsocket * sessionsocket);
 
 static xserversocketset virtualSet = {
     serversocketDel,
-
+    serversocketVal,
     serversocketOpen,
     serversocketRead,
     serversocketWrite,
     serversocketClose,
     serversocketShutdown,
-
+    serversocketInterest,
     serversocketAccept,
     serversocketRel
 };
@@ -66,6 +68,11 @@ static xserversocket * serversocketDel(xserversocket * o)
         free(o);
     }
     return o;
+}
+
+static xint32 serversocketVal(xserversocket * o)
+{
+    return o->value;
 }
 
 static xint32 serversocketOpen(xserversocket * o)
@@ -133,6 +140,19 @@ static xint32 serversocketClose(xserversocket * o)
         o->value = xserversocket_invalid_value;
     }
     return xsuccess;
+}
+
+static xuint32 serversocketInterest(xserversocket * o)
+{
+    xuint32 interest = xserversocketstatus_none;
+    if(o->value >= 0)
+    {
+        if((o->status & xserversocketstatus_in) == xserversocketstatus_none)
+        {
+            interest = interest | xserversocketstatus_in;
+        }
+    }
+    return interest;
 }
 
 static xint32 serversocketShutdown(xserversocket * o, xint32 how)

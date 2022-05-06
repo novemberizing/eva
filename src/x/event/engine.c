@@ -9,6 +9,9 @@
 #include "../command/event/generator.h"
 #include "../command/event/subscription.h"
 
+#include "../descriptor/event/generator.h"
+#include "../descriptor/event/subscription.h"
+
 static xeventengine * singleton = xnil;
 
 static void eventengineClear(xeventengine * engine);
@@ -169,7 +172,7 @@ extern void xeventengineSubscriptionPush(xeventengine * o, xeventsubscription * 
 
 extern xcommandeventsubscription * xeventengineCommandReg(xeventengine * o, xcommand * command, xcommandeventhandler on)
 {
-    xcommandeventsubscription * subscription = xcommandeventsubscriptionNew((xeventobject *) command, on);
+    xcommandeventsubscription * subscription = xcommandeventsubscriptionNew(command, on);
 
     xcommandeventgeneratorReg(o->generator.command, subscription);
 
@@ -179,6 +182,22 @@ extern xcommandeventsubscription * xeventengineCommandReg(xeventengine * o, xcom
 extern xcommandeventsubscription * xeventengineCommandEventSubscriptionUnreg(xeventengine * o, xcommandeventsubscription * subscription)
 {
     if(subscription->generator) xcommandeventgeneratorUnreg(subscription->generator, subscription);
+    if(subscription->engine) xeventengineSubscriptionRem(subscription->engine, (xeventsubscription *) subscription);
+    return subscription;
+}
+
+extern xdescriptoreventsubscription * xeventengineDescriptorReg(xeventengine * o, xdescriptor * descriptor, xdescriptoreventhandler on)
+{
+    xdescriptoreventsubscription * subscription = xdescriptoreventsubscriptionNew(descriptor, on);
+
+    xdescriptoreventgeneratorReg(o->generator.descriptor, subscription);
+
+    return subscription;
+}
+
+extern xdescriptoreventsubscription * xeventengineDescriptorEventSubscriptionUnreg(xeventengine * o, xdescriptoreventsubscription * subscription)
+{
+    if(subscription->generator) xdescriptoreventgeneratorUnreg(subscription->generator, subscription);
     if(subscription->engine) xeventengineSubscriptionRem(subscription->engine, (xeventsubscription *) subscription);
     return subscription;
 }

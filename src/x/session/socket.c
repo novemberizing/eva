@@ -10,18 +10,22 @@
 #include "socket.h"
 
 static xsessionsocket * sessionsocketDel(xsessionsocket * o);
+static xint32 sessionsocketVal(xsessionsocket * o);
 static xint32 sessionsocketOpen(xsessionsocket * o);
 static xint64 sessionsocketRead(xsessionsocket * o);
 static xint64 sessionsocketWrite(xsessionsocket * o);
 static xint32 sessionsocketClose(xsessionsocket * o);
+static xuint32 sessionsocketInterest(xsessionsocket * o);
 static xint32 sessionsocketShutdown(xsessionsocket * o, xint32 how);
 
 static xsessionsocketset virtualSet = {
     sessionsocketDel,
+    sessionsocketVal,
     sessionsocketOpen,
     sessionsocketRead,
     sessionsocketWrite,
     sessionsocketClose,
+    sessionsocketInterest,
     sessionsocketShutdown
 };
 
@@ -33,6 +37,11 @@ extern xsessionsocket * xsessionsocketNew(xint32 value)
     o->stream.out = xstreamNew(0, 0);
 
     return o;
+}
+
+static xint32 sessionsocketVal(xsessionsocket * o)
+{
+    return o->value;
 }
 
 static xsessionsocket * sessionsocketDel(xsessionsocket * o)
@@ -138,6 +147,26 @@ static xint32 sessionsocketClose(xsessionsocket * o)
         o->value = xdescriptor_invalid_value;
     }
     return xsuccess;
+}
+
+static xuint32 sessionsocketInterest(xsessionsocket * o)
+{
+    xuint32 interest = xsessionsocketstatus_none;
+    if(o->value >= 0)
+    {
+        if((o->status & xsessionsocketstatus_in) == xsessionsocketstatus_none)
+        {
+            interest = interest | xsessionsocketstatus_in;
+        }
+        if((o->status & xsessionsocketstatus_out) == xsessionsocketstatus_none)
+        {
+            if(xstreamLen(o->stream.out) > 0)
+            {
+                interest = interest | xsessionsocketstatus_out;
+            }
+        }
+    }
+    return interest;
 }
 
 static xint32 sessionsocketShutdown(xsessionsocket * o, xint32 how)

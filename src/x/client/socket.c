@@ -11,10 +11,12 @@
 #include "../socket.h"
 
 static xclientsocket * clientsocketDel(xclientsocket * o);
+static xint32 clientsocketVal(xclientsocket * o);
 static xint32 clientsocketOpen(xclientsocket * o);
 static xint64 clientsocketRead(xclientsocket * o);
 static xint64 clientsocketWrite(xclientsocket * o);
 static xint32 clientsocketClose(xclientsocket * o);
+static xuint32 clientsocketInterest(xclientsocket * o);
 static xint32 clientsocketShutdown(xclientsocket * o, xint32 how);
 static xint32 clientsocketConnect(xclientsocket * o);
 static xint64 clientsocketSend(xclientsocket * o, const unsigned char * message, xuint64 length);
@@ -22,10 +24,12 @@ static xint64 clientsocketRecv(xclientsocket * o, unsigned char * message, xuint
 
 static xclientsocketset virtualSet = {
     clientsocketDel,
+    clientsocketVal,
     clientsocketOpen,
     clientsocketRead,
     clientsocketWrite,
     clientsocketClose,
+    clientsocketInterest,
     clientsocketShutdown,
     clientsocketConnect,
     clientsocketSend,
@@ -64,6 +68,11 @@ static xclientsocket * clientsocketDel(xclientsocket * o)
 
     }
     return xnil;
+}
+
+static xint32 clientsocketVal(xclientsocket * o)
+{
+    return o->value;
 }
 
 static xint32 clientsocketOpen(xclientsocket * o)
@@ -148,6 +157,30 @@ static xint32 clientsocketClose(xclientsocket * o)
         o->value = xdescriptor_invalid_value;
     }
     return xsuccess;
+}
+
+static xuint32 clientsocketInterest(xclientsocket * o)
+{
+    xuint32 interest = xclientsocketstatus_none;
+    if(o->value >= 0)
+    {
+        if((o->status & xclientsocketstatus_open) == xclientsocketstatus_none)
+        {
+            interest = interest | xclientsocketstatus_open;
+        }
+        if((o->status & xclientsocketstatus_in) == xclientsocketstatus_none)
+        {
+            interest = interest | xclientsocketstatus_in;
+        }
+        if((o->status & xclientsocketstatus_out) == xclientsocketstatus_none)
+        {
+            if(xstreamLen(o->stream.out) > 0)
+            {
+                interest = interest | xclientsocketstatus_out;
+            }
+        }
+    }
+    return interest;
 }
 
 static xint32 clientsocketShutdown(xclientsocket * o, xint32 how)

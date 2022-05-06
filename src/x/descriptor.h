@@ -9,11 +9,25 @@
 
 #define xdescriptormode_nonblock            (0x00000001U << 0U)
 
+#define xdescriptorevent_none               (0x00000000U << 0U)
 #define xdescriptorevent_open               (0x00000001U << 0U)
 #define xdescriptorevent_in                 (0x00000001U << 1U)
 #define xdescriptorevent_out                (0x00000001U << 2U)
 #define xdescriptorevent_close              (0x00000001U << 3U)
 #define xdescriptorevent_error              (0x00000001U << 4U)
+
+#define xdescriptorstatus_none              (0x00000000U << 0U)
+#define xdescriptorstatus_open              (0x00000001U << 0U)
+#define xdescriptorstatus_in                (0x00000001U << 1U)
+#define xdescriptorstatus_out               (0x00000001U << 2U)
+#define xdescriptorstatus_close             (0x00000001U << 3U)
+#define xdescriptorstatus_error             (0x00000001U << 4U)
+
+struct xdescriptoreventsubscription;
+struct xdescriptoreventgenerator;
+
+typedef struct xdescriptoreventsubscription xdescriptoreventsubscription;
+typedef struct xdescriptoreventgenerator xdescriptoreventgenerator;
 
 struct xdescriptor;
 struct xdescriptorset;
@@ -21,15 +35,17 @@ struct xdescriptorset;
 typedef struct xdescriptor xdescriptor;
 typedef struct xdescriptorset xdescriptorset;
 
-typedef void (xdescriptoreventhandler)(xdescriptor *, xeventengine *, xuint32);
+typedef void (*xdescriptoreventhandler)(xdescriptor *, xeventengine *, xuint32);
 
 struct xdescriptorset
 {
     xdescriptor * (*del)(xdescriptor *);
+    xint32 (*val)(xdescriptor *);
     xint32 (*open)(xdescriptor *);
     xint64 (*read)(xdescriptor *);
     xint64 (*write)(xdescriptor *);
     xint32 (*close)(xdescriptor *);
+    xuint32 (*interest)(xdescriptor *);
 };
 
 struct xdescriptor
@@ -46,10 +62,12 @@ struct xdescriptor
 extern xdescriptor * xdescriptorNew(xint32 value, const xdescriptorset * set, xuint64 size);
 
 #define xdescriptorDel(o)               (o->set->del(o))
+#define xdescriptorVal(o)               (o->set->val(o))
 #define xdescriptorOpen(o)              (o->set->open(o))
 #define xdescriptorRead(o)              (o->set->read(o))
 #define xdescriptorWrite(o)             (o->set->write(o))
 #define xdescriptorClose(o)             (o->set->close(o))
+#define xdescriptorInterestEvent(o)     (o->set->interest(o))
 
 #define xdescriptorSetMode(o, value)    (o->mode = o->mode | value)
 

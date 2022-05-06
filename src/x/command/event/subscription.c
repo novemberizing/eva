@@ -12,13 +12,13 @@ static xcommandeventsubscriptionset virtualSet = {
     commandeventsubscriptionDel
 };
 
-extern xcommandeventsubscription * xcommandeventsubscriptionNew(xeventobject * object, xcommandeventhandler on)
+extern xcommandeventsubscription * xcommandeventsubscriptionNew(xcommand * command, xcommandeventhandler on)
 {
     xcommandeventsubscription * o = (xcommandeventsubscription *) calloc(1, sizeof(xcommandeventsubscription));
 
     o->set = xaddressof(virtualSet);
 
-    o->object = object;
+    o->command = command;
     o->on = on;
 
     return o;

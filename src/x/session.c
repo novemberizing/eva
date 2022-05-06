@@ -5,6 +5,7 @@
 #include "session.h"
 
 static xsession * sessionDel(xsession * o);
+static xint32 sessionVal(xsession * o);
 static xint32 sessionOpen(xsession * o);
 static xint64 sessionRead(xsession * o);
 static xint64 sessionWrite(xsession * o);
@@ -39,6 +40,13 @@ static xsession * sessionDel(xsession * o)
         free(o);
     }
     return o;
+}
+
+static xint32 sessionVal(xsession * o)
+{
+    xfunctionAssert(o->socket == xnil, "invalid parameter");
+
+    return o->socket ? xsessionsocketVal(o->socket) : xdescriptor_invalid_value;
 }
 
 static xint32 sessionOpen(xsession * o)

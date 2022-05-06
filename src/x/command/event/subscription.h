@@ -16,7 +16,7 @@ struct xcommandeventsubscription
     xcommandeventgenerator * generator;
     xeventengine * engine;
 
-    xeventobject * object;
+    xcommand * command;
 
     xcommandeventhandler on;
 };
@@ -26,7 +26,7 @@ struct xcommandeventsubscriptionset
     xcommandeventsubscription * (*del)(xcommandeventsubscription *);
 };
 
-extern xcommandeventsubscription * xcommandeventsubscriptionNew(xeventobject * object, xcommandeventhandler on);
+extern xcommandeventsubscription * xcommandeventsubscriptionNew(xcommand * command, xcommandeventhandler on);
 
 #define xcommandeventsubscriptionDel(o)     (o->set->del(o))
 

@@ -21,12 +21,21 @@ typedef struct xsessionsocketpool xsessionsocketpool;
 
 #define xsessionsocketmode_nonblock     xsocketmode_nonblock
 
+#define xsessionsocketevent_none        xsocketevent_none
 #define xsessionsocketevent_open        xsocketevent_open
 #define xsessionsocketevent_in          xsocketevent_in
 #define xsessionsocketevent_out         xsocketevent_out
 #define xsessionsocketevent_close       xsocketevent_close
 #define xsessionsocketevent_connect     xsocketevent_open
 #define xsessionsocketevent_error       xsocketevent_error
+
+#define xsessionsocketstatus_none       xsocketstatus_none
+#define xsessionsocketstatus_open       xsocketstatus_open
+#define xsessionsocketstatus_in         xsocketstatus_in
+#define xsessionsocketstatus_out        xsocketstatus_out
+#define xsessionsocketstatus_close      xsocketstatus_close
+#define xsessionsocketstatus_connect    xsocketstatus_open
+#define xsessionsocketstatus_error      xsocketstatus_error
 
 struct xsessionsocket;
 struct xsessionsocketset;
@@ -65,21 +74,24 @@ struct xsessionsocket
 struct xsessionsocketset
 {
     xsessionsocket * (*del)(xsessionsocket *);
-
+    xint32 (*val)(xsessionsocket *);
     xint32 (*open)(xsessionsocket *);
     xint64 (*read)(xsessionsocket *);
     xint64 (*write)(xsessionsocket *);
     xint32 (*close)(xsessionsocket *);
+    xuint32 (*interest)(xsessionsocket *);
     xint32 (*shutdown)(xsessionsocket *, xint32);
 };
 
 extern xsessionsocket * xsessionsocketNew(xint32 value);
 
 #define xsessionsocketDel(o)                        (o->set->del(o))
+#define xsessionsocketVal(o)                        (o->set->val(o))
 #define xsessionsocketOpen(o)                       (o->set->open(o))
 #define xsessionsocketRead(o)                       (o->set->read(o))
 #define xsessionsocketWrite(o)                      (o->set->write(o))
 #define xsessionsocketClose(o)                      (o->set->close(o))
+#define xsessionsocketInterest(o)                   (o->set->interest(o))
 #define xsessionsocketShutdown(o, how)              (o->set->shutdown(o, how))
 
 extern void xsessionsocketNonblockOn(xsessionsocket * o);
