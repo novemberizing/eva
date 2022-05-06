@@ -26,16 +26,21 @@ typedef void (*xeventhandler)(xeventobject *, xeventsubscription *, xuint32);
 
 struct xevent
 {
-    xeventsubscription * prev;
-    xeventsubscription * next;
+    xevent * prev;
+    xevent * next;
     xeventqueue * queue;
+    xeventpool * pool;
 
-    xeventobject * object;
     xeventsubscription * subscription;
     xuint32 type;
+    xeventhandler on;
 };
 
 extern xevent * xeventNew(void);
 extern xevent * xeventDel(xevent * o);
+
+extern xevent * xeventSet(xevent * o, xeventsubscription * subscription, xuint32 type, xeventhandler on);
+
+#include <x/event/type.h>
 
 #endif // __NOVEMBERIZING_X__EVENT__H__

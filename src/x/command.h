@@ -17,6 +17,8 @@ typedef struct xcommandeventsubscription xcommandeventsubscription;
 
 typedef void (*xcommandexec)(xcommand *);
 
+typedef void (*xcommandeventhandler)(xcommand *, xcommandeventsubscription *, xuint32);
+
 struct xcommand
 {
     const xcommandset * set;

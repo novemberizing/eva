@@ -19,11 +19,17 @@ libnovemberizing_a_SOURCES = x/std.c                                  \
                              x/server.c                               \
                              x/session.c                              \
                              x/session/pool.c                         \
+                             x/event.c                                \
+                             x/event/queue.c                          \
+                             x/event/pool.c                           \
                              x/event/engine.c                         \
                              x/event/engine/wait.c                    \
                              x/event/generator.c                      \
                              x/event/subscription.c                   \
-                             x/command.c
+                             x/command.c                              \
+                             x/command/event.c                        \
+                             x/command/event/generator.c              \
+                             x/command/event/subscription.c
 
 LIBS = libnovemberizing.a                                             \
        -lpthread
@@ -42,11 +48,17 @@ nobase_include_HEADERS = x/std.h                                      \
                          x/server.h                                   \
                          x/session.h                                  \
                          x/session/pool.h                             \
+                         x/event.h                                    \
+                         x/event/queue.h                              \
+                         x/event/pool.h                               \
                          x/event/engine.h                             \
                          x/event/engine/wait.h                        \
                          x/event/generator.h                          \
                          x/event/subscription.h                       \
-                         x/command.h
+                         x/command.h                                  \
+                         x/command/event.h                            \
+                         x/command/event/generator.h                  \
+                         x/command/event/subscription.h
 
 noinst_PROGRAMS = ExampleSync                                         \
                   ExampleClientSocket                                 \
@@ -57,8 +69,13 @@ noinst_PROGRAMS = ExampleSync                                         \
                   ExampleServerSocketNonblock                         \
                   ExampleServer                                       \
                   ExampleServerNonblock                               \
+                  ExampleCommand                                      \
                   ExampleEventEngine                                  \
-                  ExampleCommand
+                  ExampleEventEngineCommand
+
+
+ExampleEventEngineCommand_SOURCES = example/ExampleEventEngineCommand.c
+ExampleEventEngineCommand_LDADD = $(LIBS)
 
 ExampleCommand_SOURCES = example/ExampleCommand.c
 ExampleCommand_LDADD = $(LIBS)

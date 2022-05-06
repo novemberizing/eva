@@ -1,6 +1,10 @@
 #ifndef   __NOVEMBERIZING_X_COMMAND_EVENT__GENERATOR__H__
 #define   __NOVEMBERIZING_X_COMMAND_EVENT__GENERATOR__H__
 
+#include <x/command.h>
+
+#include <x/command/event.h>
+
 #include <x/event/generator.h>
 
 struct xcommandeventgenerator;
@@ -25,9 +29,9 @@ struct xcommandeventgenerator
 struct xcommandeventgeneratorset
 {
     xcommandeventgenerator * (*del)(xcommandeventgenerator *);
-    void (*on)(xeventgenerator *);
-    xcommandeventsubscription * (*reg)(xeventgenerator *, xcommandeventsubscription *);
-    xcommandeventsubscription * (*unreg)(xeventgenerator *, xcommandeventsubscription *);
+    void (*on)(xcommandeventgenerator *);
+    xcommandeventsubscription * (*reg)(xcommandeventgenerator *, xcommandeventsubscription *);
+    xcommandeventsubscription * (*unreg)(xcommandeventgenerator *, xcommandeventsubscription *);
 };
 
 extern xcommandeventgenerator * xcommandeventgeneratorNew(xeventengine * engine);
