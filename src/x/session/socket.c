@@ -145,6 +145,8 @@ static xint32 sessionsocketClose(xsessionsocket * o)
     {
         xint32 ret = close(o->value);
         o->value = xdescriptor_invalid_value;
+
+        xserversocketRel(o->parent.serversocket ? o->parent.serversocket : o->parent.sessionsocketpool->serversocket, o);
     }
     return xsuccess;
 }

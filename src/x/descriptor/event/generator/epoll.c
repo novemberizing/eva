@@ -71,6 +71,7 @@ static void descriptoreventgeneratorepollOn(xdescriptoreventgeneratorepoll * o)
 
             xdescriptor * descriptor = subscription->descriptor;
 
+            // client 
             if(xdescriptorOpen(descriptor) == xsuccess)
             {
                 if(xdescriptorVal(descriptor) >= 0)
@@ -93,10 +94,14 @@ static void descriptoreventgeneratorepollOn(xdescriptoreventgeneratorepoll * o)
                         descriptoreventgeneratorepollAlivePush(o, subscription);
                     }
                 }
+                else
+                {
+                    // 
+                }
             }
             else
             {
-
+                descriptoreventgeneratorepollPush(o, subscription);
             }
         }
         xfunctionThrow("todo");
