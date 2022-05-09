@@ -26,6 +26,20 @@
 #define xsocketstatus_close         xdescriptorstatus_close
 #define xsocketstatus_error         xdescriptorstatus_error
 
+#define xeventtype_socket_none      xeventtype_descriptor_none
+#define xeventtype_socket_open      xeventtype_descriptor_open
+#define xeventtype_socket_in        xeventtype_descriptor_in
+#define xeventtype_socket_out       xeventtype_descriptor_out
+#define xeventtype_socket_close     xeventtype_descriptor_close
+#define xeventtype_socket_error     xeventtype_descriptor_error
+
+#define xsocketevent_type_none      xdescriptorevent_type_none
+#define xsocketevent_type_open      xdescriptorevent_type_open
+#define xsocketevent_type_in        xdescriptorevent_type_in
+#define xsocketevent_type_out       xdescriptorevent_type_out
+#define xsocketevent_type_close     xdescriptorevent_type_close
+#define xsocketevent_type_error     xdescriptorevent_type_error
+
 struct xsocket;
 struct xsocketset;
 

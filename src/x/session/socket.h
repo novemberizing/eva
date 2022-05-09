@@ -37,6 +37,13 @@ typedef struct xsessionsocketpool xsessionsocketpool;
 #define xsessionsocketstatus_connect    xsocketstatus_open
 #define xsessionsocketstatus_error      xsocketstatus_error
 
+#define xsessionsocketevent_type_none   xsocketevent_type_none
+#define xsessionsocketevent_type_open   xsocketevent_type_open
+#define xsessionsocketevent_type_in     xsocketevent_type_in
+#define xsessionsocketevent_type_out    xsocketevent_type_out
+#define xsessionsocketevent_type_close  xsocketevent_type_close
+#define xsessionsocketevent_type_error  xsocketevent_type_error
+
 struct xsessionsocket;
 struct xsessionsocketset;
 

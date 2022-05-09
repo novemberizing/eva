@@ -2,6 +2,10 @@
 
 #include "../subscription.h"
 
+#include "../../../event/queue.h"
+#include "../../../event/pool.h"
+#include "../../../event/engine.h"
+
 static xdescriptoreventgeneratorepoll * descriptoreventgeneratorepollDel(xdescriptoreventgeneratorepoll * o);
 static void descriptoreventgeneratorepollOn(xdescriptoreventgeneratorepoll * o);
 static xdescriptoreventsubscription * descriptoreventgeneratorepollReg(xdescriptoreventgeneratorepoll * o, xdescriptoreventsubscription * subscription);
@@ -66,26 +70,33 @@ static void descriptoreventgeneratorepollOn(xdescriptoreventgeneratorepoll * o)
             xdescriptoreventsubscription * subscription = descriptoreventgeneratorepollPop(o);
 
             xdescriptor * descriptor = subscription->descriptor;
-            xdescriptorOpen(descriptor);
 
-            if(xdescriptorVal(descriptor) >= 0)
+            if(xdescriptorOpen(descriptor) == xsuccess)
             {
-                struct epoll_event event;
-                event.data.fd = xdescriptorVal(descriptor);
-                event.events = (EPOLLIN | EPOLLPRI | EPOLLHUP | EPOLLRDHUP | EPOLLERR | EPOLLONESHOT | EPOLLET);
-                if(xdescriptorInterestEvent(descriptor) & (xdescriptorevent_open | xdescriptorevent_out))
+                if(xdescriptorVal(descriptor) >= 0)
                 {
-                    event.events = event.events | EPOLLOUT;
+                    struct epoll_event event;
+                    event.data.ptr = subscription;
+                    event.events = (EPOLLIN | EPOLLPRI | EPOLLHUP | EPOLLRDHUP | EPOLLERR | EPOLLONESHOT | EPOLLET);
+                    if(xdescriptorInterestEvent(descriptor) & (xdescriptorevent_open | xdescriptorevent_out))
+                    {
+                        event.events = event.events | EPOLLOUT;
+                    }
+                    int ret = epoll_ctl(o->descriptor, EPOLL_CTL_ADD, xdescriptorVal(descriptor), xaddressof(event));
+                    if(ret < 0)
+                    {
+                        // TODO:
+                        descriptoreventgeneratorepollPush(o, subscription);
+                    }
+                    else
+                    {
+                        descriptoreventgeneratorepollAlivePush(o, subscription);
+                    }
                 }
-                int ret = epoll_ctl(o->descriptor, EPOLL_CTL_ADD, xdescriptorVal(descriptor), xaddressof(event));
-                if(ret < 0)
-                {
-                    descriptoreventgeneratorepollPush(o, subscription);
-                }
-                else
-                {
-                    descriptoreventgeneratorepollAlivePush(o, subscription);
-                }
+            }
+            else
+            {
+
             }
         }
         xfunctionThrow("todo");
@@ -94,12 +105,27 @@ static void descriptoreventgeneratorepollOn(xdescriptoreventgeneratorepoll * o)
         {
             for(xint32 i = 0; i < nfds; i++)
             {
-
+                xdescriptoreventsubscription * subscription = (xdescriptoreventsubscription *) (o->events[i].data.ptr);
+                if(o->events[i].events & (EPOLLPRI | EPOLLHUP | EPOLLRDHUP | EPOLLERR))
+                {
+                    xeventqueuePush(o->engine->queue, xeventSet(xeventpoolGet(o->engine->eventpool), (xeventsubscription *) subscription, xdescriptorevent_type | xdescriptorevent_type_error, (xeventhandler) xdescriptoreventOn));
+                    continue;
+                }
+                if(o->events[i].events & (EPOLLIN))
+                {
+                    xeventqueuePush(o->engine->queue, xeventSet(xeventpoolGet(o->engine->eventpool), (xeventsubscription *) subscription, xdescriptorevent_type | xdescriptorevent_type_in, (xeventhandler) xdescriptoreventOn));
+                    continue;
+                }
+                if(o->events[i].events & (EPOLLOUT))
+                {
+                    xeventqueuePush(o->engine->queue, xeventSet(xeventpoolGet(o->engine->eventpool), (xeventsubscription *) subscription, xdescriptorevent_type | xdescriptorevent_type_out, (xeventhandler) xdescriptoreventOn));
+                    continue;
+                }
             }
         }
         else
         {
-            // TODO: 
+            printf("todo\n");
         }
     }
 }

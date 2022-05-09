@@ -54,7 +54,7 @@ static void commandeventgeneratorOn(xcommandeventgenerator * o)
         printf("subscription => %p\n", subscription);
         xsyncUnlock(o->sync);
         xeventengineSubscriptionPush(o->engine, (xeventsubscription *) subscription);
-        xeventqueuePush(o->engine->queue, xeventSet(xeventpoolGet(o->engine->eventpool), (xeventsubscription *) subscription, xeventtype_command, (xeventhandler) xcommandeventOn));
+        xeventqueuePush(o->engine->queue, xeventSet(xeventpoolGet(o->engine->eventpool), (xeventsubscription *) subscription, xcommandevent_type, (xeventhandler) xcommandeventOn));
         xsyncLock(o->sync);
     }
     xsyncUnlock(o->sync);

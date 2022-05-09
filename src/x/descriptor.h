@@ -23,6 +23,13 @@
 #define xdescriptorstatus_close             (0x00000001U << 3U)
 #define xdescriptorstatus_error             (0x00000001U << 4U)
 
+#define xdescriptorevent_type_none          (0x00000000U << 0U)
+#define xdescriptorevent_type_open          (0x00000001U << 0U)
+#define xdescriptorevent_type_in            (0x00000001U << 1U)
+#define xdescriptorevent_type_out           (0x00000001U << 2U)
+#define xdescriptorevent_type_close         (0x00000001U << 3U)
+#define xdescriptorevent_type_error         (0x00000001U << 4U)
+
 struct xdescriptoreventsubscription;
 struct xdescriptoreventgenerator;
 
@@ -35,7 +42,7 @@ struct xdescriptorset;
 typedef struct xdescriptor xdescriptor;
 typedef struct xdescriptorset xdescriptorset;
 
-typedef void (*xdescriptoreventhandler)(xdescriptor *, xeventengine *, xuint32);
+typedef void (*xdescriptoreventhandler)(xdescriptor *, xdescriptoreventsubscription *, xuint32);
 
 struct xdescriptorset
 {
