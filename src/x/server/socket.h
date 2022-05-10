@@ -77,7 +77,7 @@ struct xserversocket
 struct xserversocketset
 {
     xserversocket * (*del)(xserversocket *);
-    xint32 (*val)(xserversocket *);
+
     xint32 (*open)(xserversocket *);
     xint64 (*read)(xserversocket *);
     xint64 (*write)(xserversocket *);
@@ -92,16 +92,16 @@ struct xserversocketset
 extern xserversocket * xserversocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addresslen);
 
 #define xserversocketDel(o)                     (o->set->del(o))
-#define xserversocketVal(o)                     (o->set->val(o))
+
 #define xserversocketOpen(o)                    (o->set->open(o))
 #define xserversocketRead(o)                    (o->set->read(o))
 #define xserversocketWrite(o)                   (o->set->write(o))
 #define xserversocketClose(o)                   (o->set->close(o))
 #define xserversocketInterest(o)                (o->set->interest(o))
+
 #define xserversocketShutdown(o, how)           (o->set->shutdown(o, how))
+
 #define xserversocketAccept(o)                  (o->set->accept(o))
 #define xserversocketRel(o, sessionsocket)      (o->set->release(o, sessionsocket))
-
-#define xserversocketSetMode(o, value)          (o->mode = o->mode | value)
 
 #endif // __NOVEMBERIZING_X_SERVER__SOCKET__H__

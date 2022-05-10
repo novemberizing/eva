@@ -10,7 +10,6 @@
 #include "socket.h"
 
 static xsessionsocket * sessionsocketDel(xsessionsocket * o);
-static xint32 sessionsocketVal(xsessionsocket * o);
 static xint32 sessionsocketOpen(xsessionsocket * o);
 static xint64 sessionsocketRead(xsessionsocket * o);
 static xint64 sessionsocketWrite(xsessionsocket * o);
@@ -20,7 +19,6 @@ static xint32 sessionsocketShutdown(xsessionsocket * o, xint32 how);
 
 static xsessionsocketset virtualSet = {
     sessionsocketDel,
-    sessionsocketVal,
     sessionsocketOpen,
     sessionsocketRead,
     sessionsocketWrite,
@@ -29,19 +27,14 @@ static xsessionsocketset virtualSet = {
     sessionsocketShutdown
 };
 
-extern xsessionsocket * xsessionsocketNew(xint32 value)
+extern xsessionsocket * xsessionsocketNew(xint32 value, xsessionsocketset * set, xuint64 size)
 {
-    xsessionsocket * o = (xsessionsocket *) xsocketNew(value, (xsocketset *) xaddressof(virtualSet), sizeof(xsessionsocket));
+    xsessionsocket * o = (xsessionsocket *) xsocketNew(value, (xsocketset *) xaddressof(virtualSet), size);
 
     o->stream.in = xstreamNew(0, 0);
     o->stream.out = xstreamNew(0, 0);
 
     return o;
-}
-
-static xint32 sessionsocketVal(xsessionsocket * o)
-{
-    return o->value;
 }
 
 static xsessionsocket * sessionsocketDel(xsessionsocket * o)
@@ -51,8 +44,8 @@ static xsessionsocket * sessionsocketDel(xsessionsocket * o)
         sessionsocketShutdown(o, xsessionsocketshutdown_all);
         sessionsocketClose(o);
 
-        if(o->parent.serversocket) xserversocketRel(o->parent.serversocket, o);
-        if(o->parent.sessionsocketpool) xsessionsocketpoolRem(o->parent.sessionsocketpool, o);
+        if(o->serversocket) xserversocketRel(o->serversocket, o);
+        if(o->sessionsocketpool) xsessionsocketpoolRem(o->sessionsocketpool, o);
 
         o->sync = xsyncDel(o->sync);
 
@@ -146,7 +139,7 @@ static xint32 sessionsocketClose(xsessionsocket * o)
         xint32 ret = close(o->value);
         o->value = xdescriptor_invalid_value;
 
-        xserversocketRel(o->parent.serversocket ? o->parent.serversocket : o->parent.sessionsocketpool->serversocket, o);
+        xserversocketRel(o->serversocket ? o->serversocket : o->sessionsocketpool->serversocket, o);
     }
     return xsuccess;
 }

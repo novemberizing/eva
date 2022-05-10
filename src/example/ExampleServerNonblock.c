@@ -17,20 +17,20 @@ int main(int argc, char ** argv)
 
     xserver * server = xserverNew(AF_INET, SOCK_STREAM, IPPROTO_TCP, xaddressof(addr), sizeof(struct sockaddr_in), xnil);
 
-    xserversocketSetMode(server->socket, xserversocketmode_reuseaddr);
-    xserversocketSetMode(server->socket, xserversocketmode_nonblock);
+    server->mode = server->mode | xserversocketmode_reuseaddr;
+    server->mode = server->mode | xserversocketmode_nonblock;
 
     if(xserverOpen(server) == xsuccess)
     {
-        if(xeventengineWait((xdescriptor *) server->socket, xserversocketevent_in, 0, 0) == xsuccess)
+        if(xeventengineWait((xdescriptor *) server, xserversocketevent_in, 0, 0) == xsuccess)
         {
             xsession * session = xserverAccept(server);
-            if(xeventengineWait((xdescriptor *) session->socket, xsessionsocketevent_in, 0, 0) == xsuccess)
+            if(xeventengineWait((xdescriptor *) session, xsessionsocketevent_in, 0, 0) == xsuccess)
             {
                 xsessionRead(session);
-                printf("%s", xstreamFront(session->socket->stream.in));
-                xsessionsocketNonblockOff(session->socket);
-                xstreamPush(session->socket->stream.out, xstreamFront(session->socket->stream.in), xstreamLen(session->socket->stream.in));
+                printf("%s", xstreamFront(session->stream.in));
+                xsessionsocketNonblockOff(session);
+                xstreamPush(session->stream.out, xstreamFront(session->stream.in), xstreamLen(session->stream.in));
                 xsessionWrite(session);
             }
             xsessionClose(session);

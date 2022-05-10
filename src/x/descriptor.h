@@ -50,7 +50,6 @@ typedef void (*xdescriptoreventhandler)(xdescriptor *, xdescriptoreventsubscript
 struct xdescriptorset
 {
     xdescriptor * (*del)(xdescriptor *);
-    xint32 (*val)(xdescriptor *);
     xint32 (*open)(xdescriptor *);
     xint64 (*read)(xdescriptor *);
     xint64 (*write)(xdescriptor *);
@@ -63,7 +62,7 @@ struct xdescriptor
     const xdescriptorset * set;
 
     xsync * sync;
-    xint32 value;
+    xint32  value;
     xuint32 status;
     xuint32 mode;
    
@@ -72,13 +71,10 @@ struct xdescriptor
 extern xdescriptor * xdescriptorNew(xint32 value, const xdescriptorset * set, xuint64 size);
 
 #define xdescriptorDel(o)               (o->set->del(o))
-#define xdescriptorVal(o)               (o->set->val(o))
 #define xdescriptorOpen(o)              (o->set->open(o))
 #define xdescriptorRead(o)              (o->set->read(o))
 #define xdescriptorWrite(o)             (o->set->write(o))
 #define xdescriptorClose(o)             (o->set->close(o))
 #define xdescriptorInterestEvent(o)     (o->set->interest(o))
-
-#define xdescriptorSetMode(o, value)    (o->mode = o->mode | value)
 
 #endif // __NOVEMBERIZING_X__DESCRIPTOR__H__

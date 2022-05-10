@@ -53,12 +53,13 @@ typedef struct xsocketset xsocketset;
 struct xsocketset
 {
     xsocket * (*del)(xsocket *);
-    xint32 (*val)(xsocket *);
+
     xint32 (*open)(xsocket *);
     xint64 (*read)(xsocket *);
     xint64 (*write)(xsocket *);
     xint32 (*close)(xsocket *);
     xuint32 (*interest)(xsocket *);
+
     xint32 (*shutdown)(xsocket *, xint32);
 };
 
@@ -75,7 +76,6 @@ struct xsocket
 extern xsocket * xsocketNew(xint32 value, const xsocketset * set, xuint64 size);
 
 #define xsocketDel(o)               (o->set->del(o))
-#define xsocketVal(o)               (o->set->val(o))
 #define xsocketOpen(o)              (o->set->open(o))
 #define xsocketRead(o)              (o->set->read(o))
 #define xsocketWrite(o)             (o->set->write(o))

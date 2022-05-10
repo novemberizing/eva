@@ -11,20 +11,21 @@
 #include "../socket.h"
 
 static xclientsocket * clientsocketDel(xclientsocket * o);
-static xint32 clientsocketVal(xclientsocket * o);
+
 static xint32 clientsocketOpen(xclientsocket * o);
 static xint64 clientsocketRead(xclientsocket * o);
 static xint64 clientsocketWrite(xclientsocket * o);
 static xint32 clientsocketClose(xclientsocket * o);
 static xuint32 clientsocketInterest(xclientsocket * o);
+
 static xint32 clientsocketShutdown(xclientsocket * o, xint32 how);
+
 static xint32 clientsocketConnect(xclientsocket * o);
 static xint64 clientsocketSend(xclientsocket * o, const unsigned char * message, xuint64 length);
 static xint64 clientsocketRecv(xclientsocket * o, unsigned char * message, xuint64 length);
 
 static xclientsocketset virtualSet = {
     clientsocketDel,
-    clientsocketVal,
     clientsocketOpen,
     clientsocketRead,
     clientsocketWrite,
@@ -56,9 +57,10 @@ static xclientsocket * clientsocketDel(xclientsocket * o)
 {
     if(o)
     {
-        clientsocketShutdown(o, xsocketshutdown_all);
         clientsocketClose(o);
+
         o->sync = xsyncDel(o->sync);
+
         o->stream.in = xstreamDel(o->stream.in);
         o->stream.out = xstreamDel(o->stream.out);
 
@@ -68,11 +70,6 @@ static xclientsocket * clientsocketDel(xclientsocket * o)
 
     }
     return xnil;
-}
-
-static xint32 clientsocketVal(xclientsocket * o)
-{
-    return o->value;
 }
 
 static xint32 clientsocketOpen(xclientsocket * o)
@@ -91,14 +88,17 @@ static xint64 clientsocketRead(xclientsocket * o)
         if(ret > 0)
         {
             o->stream.in->size = o->stream.in->size + ret;
+            o->status = o->status | xclientsocketstatus_in;
             return ret;
         }
         else if(ret == 0)
         {
+            o->status = o->status & (~xclientsocketstatus_in);
             return xfail;
         }
         else
         {
+            o->status = o->status & (~xclientsocketstatus_in);
             if(errno == EAGAIN)
             {
                 return xsuccess;
@@ -123,14 +123,17 @@ static xint64 clientsocketWrite(xclientsocket * o)
             if(ret > 0)
             {
                 o->stream.out->position = o->stream.out->position + ret;
+                o->status = o->status | xclientsocketstatus_out;
                 return ret;
             }
             else if(ret == 0)
             {
+                o->status = o->status & (~xclientsocketstatus_out);
                 return xsuccess;
             }
             else
             {
+                o->status = o->status & (~xclientsocketstatus_out);
                 if(errno == EAGAIN)
                 {
                     return xsuccess;
@@ -153,7 +156,9 @@ static xint32 clientsocketClose(xclientsocket * o)
 {
     if(o->value >= 0)
     {
+        clientsocketShutdown(o->value, xclientsocketshutdown_all);
         xint32 ret = close(o->value);
+        o->status = xclientsocketstatus_close;
         o->value = xdescriptor_invalid_value;
     }
     return xsuccess;

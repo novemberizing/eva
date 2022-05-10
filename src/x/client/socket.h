@@ -69,13 +69,15 @@ struct xclientsocket
 struct xclientsocketset
 {
     xclientsocket * (*del)(xclientsocket *);
-    xint32 (*val)(xclientsocket *);
+
     xint32 (*open)(xclientsocket *);
     xint64 (*read)(xclientsocket *);
     xint64 (*write)(xclientsocket *);
     xint32 (*close)(xclientsocket *);
     xuint32 (*interest)(xclientsocket *);
+
     xint32 (*shutdown)(xclientsocket *, xint32);
+
     xint32 (*connect)(xclientsocket *);
     xint64 (*send)(xclientsocket *, const unsigned char *, xuint64);
     xint64 (*recv)(xclientsocket *, unsigned char *, xuint64);
@@ -84,17 +86,17 @@ struct xclientsocketset
 extern xclientsocket * xclientsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addresslen);
 
 #define xclientsocketDel(o)                     (o->set->del(o))
-#define xclientsocketVal(o)                     (o->set->val(o))
+
 #define xclientsocketOpen(o)                    (o->set->open(o))
 #define xclientsocketRead(o)                    (o->set->read(o))
 #define xclientsocketWrite(o)                   (o->set->write(o))
 #define xclientsocketClose(o)                   (o->set->close(o))
 #define xclientsocketInterest(o)                (o->set->interest(o))
+
 #define xclientsocketShutdown(o, how)           (o->set->shutdown(o, how))
+
 #define xclientsocketConnect(o)                 (o->set->connect(o))
 #define xclientsocketSend(o, message, length)   (o->set->send(o, message, length))
 #define xclientsocketRecv(o, buffer, length)    (o->set->recv(o, buffer, length))
-
-#define xclientsocketSetMode(o, value)          (o->mode = o->mode | value);
 
 #endif // __NOVEMBERIZING_X_CLIENT__SOCKET__H__

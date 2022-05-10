@@ -10,7 +10,7 @@
 #include "socket.h"
 
 static xserversocket * serversocketDel(xserversocket * o);
-static xint32 serversocketVal(xserversocket * o);
+
 static xint32 serversocketOpen(xserversocket * o);
 static xint64 serversocketRead(xserversocket * o);
 static xint64 serversocketWrite(xserversocket * o);
@@ -22,7 +22,7 @@ static void serversocketRel(xserversocket * o, xsessionsocket * sessionsocket);
 
 static xserversocketset virtualSet = {
     serversocketDel,
-    serversocketVal,
+
     serversocketOpen,
     serversocketRead,
     serversocketWrite,
@@ -68,11 +68,6 @@ static xserversocket * serversocketDel(xserversocket * o)
         free(o);
     }
     return o;
-}
-
-static xint32 serversocketVal(xserversocket * o)
-{
-    return o->value;
 }
 
 static xint32 serversocketOpen(xserversocket * o)
@@ -184,18 +179,18 @@ static void serversocketPush(xserversocket * o, xsessionsocket * sessionsocket)
 {
     xsyncLock(o->sync);
 
-    sessionsocket->parent.prev = o->tail;
+    sessionsocket->prev = o->tail;
     
-    if(sessionsocket->parent.prev)
+    if(sessionsocket->prev)
     {
-        sessionsocket->parent.prev->parent.next = sessionsocket;
+        sessionsocket->prev->next = sessionsocket;
     }
     else
     {
         o->head = sessionsocket;
     }
 
-    sessionsocket->parent.serversocket = o;
+    sessionsocket->serversocket = o;
 
     o->tail = sessionsocket;
     o->size = o->size + 1;
@@ -207,12 +202,12 @@ static void serversocketRem(xserversocket * o, xsessionsocket * sessionsocket)
     if(o)
     {
         xsyncLock(o->sync);
-        xsessionsocket * prev = sessionsocket->parent.prev;
-        xsessionsocket * next = sessionsocket->parent.next;
-        if(sessionsocket->parent.prev)
+        xsessionsocket * prev = sessionsocket->prev;
+        xsessionsocket * next = sessionsocket->next;
+        if(sessionsocket->prev)
         {
-            prev->parent.next = next;
-            sessionsocket->parent.prev = xnil;
+            prev->next = next;
+            sessionsocket->prev = xnil;
         }
         else
         {
@@ -220,14 +215,14 @@ static void serversocketRem(xserversocket * o, xsessionsocket * sessionsocket)
         }
         if(next)
         {
-            next->parent.prev = prev;
-            sessionsocket->parent.next = xnil;
+            next->prev = prev;
+            sessionsocket->next = xnil;
         }
         else
         {
             o->tail = prev;
         }
-        sessionsocket->parent.serversocket = xnil;
+        sessionsocket->serversocket = xnil;
         o->size = o->size - 1;
         xsyncUnlock(o->sync);
     }
@@ -240,18 +235,18 @@ static void serversocketClear(xserversocket * o)
     {
         node = o->head;
 
-        o->head = node->parent.next;
+        o->head = node->next;
 
         if(o->head)
         {
-            node->parent.next = xnil;
+            node->next = xnil;
         }
         else
         {
             o->tail = xnil;
         }
         o->size = o->size - 1;
-        node->parent.serversocket = xnil;
+        node->serversocket = xnil;
 
         xsessionsocketpoolPush(o->sessionsocketpool, node);
     }

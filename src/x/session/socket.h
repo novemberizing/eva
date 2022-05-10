@@ -73,35 +73,35 @@ struct xsessionsocket
         xstream * out;
     } stream;
 
-    struct {
-        xsessionsocketpool * sessionsocketpool;
-        xserversocket * serversocket;
-        xsessionsocket * prev;
-        xsessionsocket * next;
-    } parent;
+    xsessionsocketpool * sessionsocketpool;
+    xserversocket * serversocket;
+    xsessionsocket * prev;
+    xsessionsocket * next;
 };
 
 struct xsessionsocketset
 {
     xsessionsocket * (*del)(xsessionsocket *);
-    xint32 (*val)(xsessionsocket *);
+
     xint32 (*open)(xsessionsocket *);
     xint64 (*read)(xsessionsocket *);
     xint64 (*write)(xsessionsocket *);
     xint32 (*close)(xsessionsocket *);
     xuint32 (*interest)(xsessionsocket *);
+
     xint32 (*shutdown)(xsessionsocket *, xint32);
 };
 
-extern xsessionsocket * xsessionsocketNew(xint32 value);
+extern xsessionsocket * xsessionsocketNew(xint32 value, xsessionsocketset * set, xuint64 size);
 
 #define xsessionsocketDel(o)                        (o->set->del(o))
-#define xsessionsocketVal(o)                        (o->set->val(o))
+
 #define xsessionsocketOpen(o)                       (o->set->open(o))
 #define xsessionsocketRead(o)                       (o->set->read(o))
 #define xsessionsocketWrite(o)                      (o->set->write(o))
 #define xsessionsocketClose(o)                      (o->set->close(o))
 #define xsessionsocketInterest(o)                   (o->set->interest(o))
+
 #define xsessionsocketShutdown(o, how)              (o->set->shutdown(o, how))
 
 extern void xsessionsocketNonblockOn(xsessionsocket * o);

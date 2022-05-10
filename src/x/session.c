@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <errno.h>
+#include <unistd.h>
 
 #include "session.h"
 
@@ -23,10 +25,7 @@ static xsessionset virtualSet = {
 
 extern xsession * xsessionNew(void)
 {
-    xsession * o = (xsession *) calloc(1, sizeof(xsession));
-
-    o->set = xaddressof(virtualSet);
-    o->socket = xnil;
+    xsession * o = (xsession *) xsessionsocketNew(xdescriptor_invalid_value, (xsessionsocketset *) xaddressof(virtualSet), sizeof(xsession));
 
     return o;
 }
@@ -35,55 +34,84 @@ static xsession * sessionDel(xsession * o)
 {
     if(o)
     {
-        if(o->socket) o->socket = xsessionsocketDel(o->socket);
+        sessionClose(o);
+
+        if(o->server) xserverRel(o->server, o);
+        if(o->sessionpool) xsessionpoolRem(o->sessionpool, o);
+
+        o->stream.in = xstreamDel(o->stream.in);
+        o->stream.out = xstreamDel(o->stream.out);
+
+        xobjectSet(xaddressof(o->address), xnil, 0);
+
+        o->sync = xsyncDel(o->sync);
 
         free(o);
     }
     return o;
 }
 
-static xint32 sessionVal(xsession * o)
-{
-    xfunctionAssert(o->socket == xnil, "invalid parameter");
-
-    return o->socket ? xsessionsocketVal(o->socket) : xdescriptor_invalid_value;
-}
 
 static xint32 sessionOpen(xsession * o)
 {
-    xfunctionAssert(o->socket == xnil, "invalid parameter");
-
-    return o->socket ? xsessionsocketOpen(o->socket) : xfail;
+    return xfail;
 }
 
 static xint64 sessionRead(xsession * o)
 {
-    xfunctionAssert(o->socket == xnil, "invalid parameter");
+    if(o->value >= 0)
+    {
+        xstreamReserve(o->stream.in, 8192, 1024);
 
-    return o->socket ? xsessionsocketRead(o->socket) : xfail;
+        xint32 n = read(o->value, xstreamBack(o->stream.in), xstreamRemain(o->stream.in));
+
+        if(n > 0)
+        {
+
+        }
+        else if(n == 0)
+        {
+
+        }
+        else
+        {
+            if(errno == EAGAIN)
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+    }
+    else
+    {
+        return xfail;
+    }
 }
 
 static xint64 sessionWrite(xsession * o)
 {
-    xfunctionAssert(o->socket == xnil, "invalid parameter");
+    // xfunctionAssert(o->socket == xnil, "invalid parameter");
 
-    return o->socket ? xsessionsocketWrite(o->socket) : xfail;
+    // return o->socket ? xsessionsocketWrite(o->socket) : xfail;
 }
 
 static xint32 sessionClose(xsession * o)
 {
-    xfunctionAssert(o->socket == xnil, "invalid parameter");
+    // xfunctionAssert(o->socket == xnil, "invalid parameter");
 
-    xint32 ret = xsessionsocketClose(o->socket);
+    // xint32 ret = xsessionsocketClose(o->socket);
 
-    xserverRel(o->parent.server, o);
+    // xserverRel(o->parent.server, o);
 
-    return ret;
+    // return ret;
 }
 
 static xint32 sessionShutdown(xsession * o, xint32 how)
 {
-    xfunctionAssert(o->socket == xnil, "invalid parameter");
+    // xfunctionAssert(o->socket == xnil, "invalid parameter");
 
-    return o->socket ? xsessionsocketShutdown(o, how) : xfail;
+    // return o->socket ? xsessionsocketShutdown(o, how) : xfail;
 }
