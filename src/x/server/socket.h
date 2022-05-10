@@ -11,37 +11,40 @@ struct xsessionsocketpool;
 typedef struct xsessionsocket xsessionsocket;
 typedef struct xsessionsocketpool xsessionsocketpool;
 
-#define xserversocket_invalid_value     xsocket_invalud_value
+#define xserversocket_invalid_value         xsocket_invalud_value
 
-#define xserversocketmode_nonblock      xsocketmode_nonblock
-#define xserversocketmode_reuseaddr     xsocketmode_reuseaddr
+#define xserversocketmode_nonblock          xsocketmode_nonblock
+#define xserversocketmode_reuseaddr         xsocketmode_reuseaddr
 
-#define xserversocketshutdown_in        xsocketshutdown_in
-#define xserversocketshutdown_out       xsocketshutdown_out
-#define xserversocketshutdown_all       xsocketshutdown_all
+#define xserversocketshutdown_in            xsocketshutdown_in
+#define xserversocketshutdown_out           xsocketshutdown_out
+#define xserversocketshutdown_all           xsocketshutdown_all
 
-#define xserversocketevent_none         xsocketevent_none
-#define xserversocketevent_open         xsocketevent_open
-#define xserversocketevent_in           xsocketevent_in
-#define xserversocketevent_out          xsocketevent_out
-#define xserversocketevent_close        xsocketevent_close
-#define xserversocketevent_connect      xsocketevent_open
-#define xserversocketevent_error        xsocketevent_error
+#define xserversocketevent_none             xsocketevent_none
+#define xserversocketevent_open             xsocketevent_open
+#define xserversocketevent_in               xsocketevent_in
+#define xserversocketevent_out              xsocketevent_out
+#define xserversocketevent_close            xsocketevent_close
+#define xserversocketevent_connect          xsocketevent_open
+#define xserversocketevent_error            xsocketevent_error
+#define xserversocketevent_release          xsocketevent_release
 
-#define xserversocketstatus_none        xsocketstatus_none
-#define xserversocketstatus_open        xsocketstatus_open
-#define xserversocketstatus_in          xsocketstatus_in
-#define xserversocketstatus_out         xsocketstatus_out
-#define xserversocketstatus_close       xsocketstatus_close
-#define xserversocketstatus_connect     xsocketstatus_open
-#define xserversocketstatus_error       xsocketstatus_error
+#define xserversocketstatus_none            xsocketstatus_none
+#define xserversocketstatus_open            xsocketstatus_open
+#define xserversocketstatus_in              xsocketstatus_in
+#define xserversocketstatus_out             xsocketstatus_out
+#define xserversocketstatus_close           xsocketstatus_close
+#define xserversocketstatus_connect         xsocketstatus_open
+#define xserversocketstatus_error           xsocketstatus_error
+#define xserversocketstatus_release         xsocketstatus_release
 
-#define xserversocketevent_type_none    xsocketevent_type_none
-#define xserversocketevent_type_open    xsocketevent_type_open
-#define xserversocketevent_type_in      xsocketevent_type_in
-#define xserversocketevent_type_out     xsocketevent_type_out
-#define xserversocketevent_type_close   xsocketevent_type_close
-#define xserversocketevent_type_error   xsocketevent_type_error
+#define xserversocketevent_type_none        xsocketevent_type_none
+#define xserversocketevent_type_open        xsocketevent_type_open
+#define xserversocketevent_type_in          xsocketevent_type_in
+#define xserversocketevent_type_out         xsocketevent_type_out
+#define xserversocketevent_type_close       xsocketevent_type_close
+#define xserversocketevent_type_error       xsocketevent_type_error
+#define xserversocketevent_type_release     xsocketevent_type_release
 
 struct xserversocket;
 struct xserversocketset;

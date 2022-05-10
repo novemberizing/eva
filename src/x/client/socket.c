@@ -180,6 +180,10 @@ static xuint32 clientsocketInterest(xclientsocket * o)
             }
         }
     }
+    else
+    {
+        interest = interest | xclientsocketstatus_open;
+    }
     return interest;
 }
 

@@ -71,7 +71,8 @@ static void descriptoreventgeneratorepollOn(xdescriptoreventgeneratorepoll * o)
 
             xdescriptor * descriptor = subscription->descriptor;
 
-            // client 
+            xuint32 interest = xdescriptorInterestEvent(descriptor);
+
             if(xdescriptorOpen(descriptor) == xsuccess)
             {
                 if(xdescriptorVal(descriptor) >= 0)
@@ -96,7 +97,7 @@ static void descriptoreventgeneratorepollOn(xdescriptoreventgeneratorepoll * o)
                 }
                 else
                 {
-                    // 
+                    descriptoreventgeneratorepollPush(o, subscription);
                 }
             }
             else
@@ -104,7 +105,6 @@ static void descriptoreventgeneratorepollOn(xdescriptoreventgeneratorepoll * o)
                 descriptoreventgeneratorepollPush(o, subscription);
             }
         }
-        xfunctionThrow("todo");
         xint32 nfds = epoll_wait(o->descriptor, o->events, o->maxevents, o->timeout);
         if(nfds >= 0)
         {

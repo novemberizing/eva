@@ -18,6 +18,7 @@
 #define xsocketevent_out            xdescriptorevent_out
 #define xsocketevent_close          xdescriptorevent_close
 #define xsocketevent_error          xdescriptorevent_error
+#define xsocketevent_release        xdescriptorevent_release
 
 #define xsocketstatus_none          xdescriptorstatus_none
 #define xsocketstatus_open          xdescriptorstatus_open
@@ -25,6 +26,7 @@
 #define xsocketstatus_out           xdescriptorstatus_out
 #define xsocketstatus_close         xdescriptorstatus_close
 #define xsocketstatus_error         xdescriptorstatus_error
+#define xsocketstatus_release       xdescriptorstatus_release
 
 #define xeventtype_socket_none      xeventtype_descriptor_none
 #define xeventtype_socket_open      xeventtype_descriptor_open
@@ -32,6 +34,7 @@
 #define xeventtype_socket_out       xeventtype_descriptor_out
 #define xeventtype_socket_close     xeventtype_descriptor_close
 #define xeventtype_socket_error     xeventtype_descriptor_error
+#define xeventtype_socket_release   xeventtype_descriptor_release
 
 #define xsocketevent_type_none      xdescriptorevent_type_none
 #define xsocketevent_type_open      xdescriptorevent_type_open
@@ -39,6 +42,7 @@
 #define xsocketevent_type_out       xdescriptorevent_type_out
 #define xsocketevent_type_close     xdescriptorevent_type_close
 #define xsocketevent_type_error     xdescriptorevent_type_error
+#define xsocketevent_type_release   xdescriptorevent_type_release
 
 struct xsocket;
 struct xsocketset;

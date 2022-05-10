@@ -15,6 +15,7 @@
 #define xdescriptorevent_out                (0x00000001U << 2U)
 #define xdescriptorevent_close              (0x00000001U << 3U)
 #define xdescriptorevent_error              (0x00000001U << 4U)
+#define xdescriptorevent_release            (0x00000001U << 5U)
 
 #define xdescriptorstatus_none              (0x00000000U << 0U)
 #define xdescriptorstatus_open              (0x00000001U << 0U)
@@ -22,6 +23,7 @@
 #define xdescriptorstatus_out               (0x00000001U << 2U)
 #define xdescriptorstatus_close             (0x00000001U << 3U)
 #define xdescriptorstatus_error             (0x00000001U << 4U)
+#define xdescriptorstatus_release           (0x00000001U << 5U)
 
 #define xdescriptorevent_type_none          (0x00000000U << 0U)
 #define xdescriptorevent_type_open          (0x00000001U << 0U)
@@ -29,6 +31,7 @@
 #define xdescriptorevent_type_out           (0x00000001U << 2U)
 #define xdescriptorevent_type_close         (0x00000001U << 3U)
 #define xdescriptorevent_type_error         (0x00000001U << 4U)
+#define xdescriptorevent_type_release       (0x00000001U << 5U)
 
 struct xdescriptoreventsubscription;
 struct xdescriptoreventgenerator;

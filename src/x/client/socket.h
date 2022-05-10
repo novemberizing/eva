@@ -5,36 +5,39 @@
 #include <x/stream.h>
 #include <x/object.h>
 
-#define xclientsocket_invalid_value     xsocket_invalud_value
+#define xclientsocket_invalid_value         xsocket_invalud_value
 
-#define xclientsocketshutdown_in        xsocketshutdown_in
-#define xclientsocketshutdown_out       xsocketshutdown_out
-#define xclientsocketshutdown_all       xsocketshutdown_all
+#define xclientsocketshutdown_in            xsocketshutdown_in
+#define xclientsocketshutdown_out           xsocketshutdown_out
+#define xclientsocketshutdown_all           xsocketshutdown_all
 
-#define xclientsocketmode_nonblock      xsocketmode_nonblock
+#define xclientsocketmode_nonblock          xsocketmode_nonblock
 
-#define xclientsocketevent_none         xsocketevent_none
-#define xclientsocketevent_open         xsocketevent_open
-#define xclientsocketevent_in           xsocketevent_in
-#define xclientsocketevent_out          xsocketevent_out
-#define xclientsocketevent_close        xsocketevent_close
-#define xclientsocketevent_connect      xsocketevent_open
-#define xclientsocketevent_error        xsocketevent_error
+#define xclientsocketevent_none             xsocketevent_none
+#define xclientsocketevent_open             xsocketevent_open
+#define xclientsocketevent_in               xsocketevent_in
+#define xclientsocketevent_out              xsocketevent_out
+#define xclientsocketevent_close            xsocketevent_close
+#define xclientsocketevent_connect          xsocketevent_open
+#define xclientsocketevent_error            xsocketevent_error
+#define xclientsocketevent_release          xsocketevent_release
 
-#define xclientsocketstatus_none        xsocketstatus_none
-#define xclientsocketstatus_open        xsocketstatus_open
-#define xclientsocketstatus_in          xsocketstatus_in
-#define xclientsocketstatus_out         xsocketstatus_out
-#define xclientsocketstatus_close       xsocketstatus_close
-#define xclientsocketstatus_connect     xsocketstatus_open
-#define xclientsocketstatus_error       xsocketstatus_error
+#define xclientsocketstatus_none            xsocketstatus_none
+#define xclientsocketstatus_open            xsocketstatus_open
+#define xclientsocketstatus_in              xsocketstatus_in
+#define xclientsocketstatus_out             xsocketstatus_out
+#define xclientsocketstatus_close           xsocketstatus_close
+#define xclientsocketstatus_connect         xsocketstatus_open
+#define xclientsocketstatus_error           xsocketstatus_error
+#define xclientsocketstatus_release         xsocketstatus_release
 
-#define xclientsocketevent_type_none    xsocketevent_type_none
-#define xclientsocketevent_type_open    xsocketevent_type_open
-#define xclientsocketevent_type_in      xsocketevent_type_in
-#define xclientsocketevent_type_out     xsocketevent_type_out
-#define xclientsocketevent_type_close   xsocketevent_type_close
-#define xclientsocketevent_type_error   xsocketevent_type_error
+#define xclientsocketevent_type_none        xsocketevent_type_none
+#define xclientsocketevent_type_open        xsocketevent_type_open
+#define xclientsocketevent_type_in          xsocketevent_type_in
+#define xclientsocketevent_type_out         xsocketevent_type_out
+#define xclientsocketevent_type_close       xsocketevent_type_close
+#define xclientsocketevent_type_error       xsocketevent_type_error
+#define xclientsocketevent_type_release     xsocketevent_type_release
 
 struct xclientsocket;
 struct xclientsocketset;

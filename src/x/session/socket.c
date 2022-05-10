@@ -168,6 +168,10 @@ static xuint32 sessionsocketInterest(xsessionsocket * o)
             }
         }
     }
+    else
+    {
+        interest = interest | xsessionsocketstatus_release;
+    }
     return interest;
 }
 

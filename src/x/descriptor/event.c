@@ -15,6 +15,7 @@ extern void xdescriptoreventOn(xdescriptor * descriptor, xdescriptoreventsubscri
             {
                 subscription->on(descriptor, subscription, xdescriptorevent_type | xdescriptorevent_type_in);
             }
+
             n = xdescriptorWrite(descriptor);
             if(n > 0)
             {
@@ -23,6 +24,7 @@ extern void xdescriptoreventOn(xdescriptor * descriptor, xdescriptoreventsubscri
             else if(n < 0)
             {
                 subscription->on(descriptor, subscription, xdescriptorevent_type | xdescriptorevent_type_error);
+
 
                 xdescriptorClose(descriptor);
                 subscription->on(descriptor, subscription, xdescriptorevent_type | xdescriptorevent_type_close);

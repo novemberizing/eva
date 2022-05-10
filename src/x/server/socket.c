@@ -152,6 +152,10 @@ static xuint32 serversocketInterest(xserversocket * o)
             interest = interest | xserversocketstatus_in;
         }
     }
+    else
+    {
+        interest = interest | xserversocketstatus_open;
+    }
     return interest;
 }
 
