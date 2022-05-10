@@ -59,12 +59,12 @@ static xclientsocket * clientsocketDel(xclientsocket * o)
     {
         clientsocketClose(o);
 
-        o->sync = xsyncDel(o->sync);
+        xobjectSet(xaddressof(o->address), xnil, 0);
 
         o->stream.in = xstreamDel(o->stream.in);
         o->stream.out = xstreamDel(o->stream.out);
 
-        xobjectSet(xaddressof(o->address), xnil, 0);
+        o->sync = xsyncDel(o->sync);
 
         free(o);
 
@@ -94,6 +94,7 @@ static xint64 clientsocketRead(xclientsocket * o)
         else if(ret == 0)
         {
             o->status = o->status & (~xclientsocketstatus_in);
+            o->status = o->status | xclientsocketstatus_error;
             return xfail;
         }
         else
@@ -103,11 +104,13 @@ static xint64 clientsocketRead(xclientsocket * o)
             {
                 return xsuccess;
             }
+            o->status = o->status | xclientsocketstatus_error;
             return xfail;
         }
     }
     else
     {
+        o->status = o->status | xclientsocketstatus_error;
         return xfail;
     }
 }
@@ -138,6 +141,7 @@ static xint64 clientsocketWrite(xclientsocket * o)
                 {
                     return xsuccess;
                 }
+                o->status = o->status | xclientsocketstatus_error;
                 return xfail;
             }
         }
@@ -148,6 +152,7 @@ static xint64 clientsocketWrite(xclientsocket * o)
     }
     else
     {
+        o->status = o->status | xclientsocketstatus_error;
         return xfail;
     }
 }
@@ -218,17 +223,16 @@ static xint32 clientsocketConnect(xclientsocket * o)
     if(o->value < 0)
     {
         o->value = socket(o->domain, o->type, o->protocol);
-        // nonblock connect
     }
 
     if(o->value >= 0)
     {
         if(o->mode & xclientsocketmode_nonblock)
         {
-            // 에러 핸들링을 하자.
             int flags = fcntl(o->value, F_GETFL, 0);
             fcntl(o->value, F_SETFL, flags | O_NONBLOCK);
         }
+
         xint32 ret = connect(o->value, (struct sockaddr *) o->address.value, o->address.length);
 
         if(ret < 0)
@@ -274,7 +278,7 @@ static xint64 clientsocketRecv(xclientsocket * o, unsigned char * buffer, xuint6
         xint64 len = 0;
         if(xstreamLen(o->stream.in) > 0)
         {
-            len = xstreamPop(o->stream.in, buffer, len);
+            len = xstreamPop(o->stream.in, buffer, xstreamLen(o->stream.in));
         }
 
         xint64 ret = read(o->value, xaddressof(buffer[len]), length - len);
