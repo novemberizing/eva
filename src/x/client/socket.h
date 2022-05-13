@@ -45,11 +45,16 @@ struct xclientsocketset;
 typedef struct xclientsocket xclientsocket;
 typedef struct xclientsocketset xclientsocketset;
 
+struct xclientsocketeventsubscription;
+typedef struct xclientsocketeventsubscription xclientsocketeventsubscription;
+
 struct xclientsocket
 {
     const xclientsocketset * set;
 
+    xclientsocketeventsubscription * subscription;
     xsync * sync;
+
     xint32 value;
     xuint32 status;
     xuint32 mode;
@@ -78,12 +83,12 @@ struct xclientsocketset
 
     xint32 (*shutdown)(xclientsocket *, xint32);
 
-    xint32 (*connect)(xclientsocket *);
+    xint32 (*connect)(xclientsocket *, const void *, xuint64);
     xint64 (*send)(xclientsocket *, const unsigned char *, xuint64);
     xint64 (*recv)(xclientsocket *, unsigned char *, xuint64);
 };
 
-extern xclientsocket * xclientsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addresslen);
+extern xclientsocket * xclientsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addresslen, xuint64 size);
 
 #define xclientsocketDel(o)                     (o->set->del(o))
 

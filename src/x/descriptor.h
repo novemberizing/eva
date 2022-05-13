@@ -61,7 +61,9 @@ struct xdescriptor
 {
     const xdescriptorset * set;
 
+    xdescriptoreventsubscription * subscription;
     xsync * sync;
+    
     xint32  value;
     xuint32 status;
     xuint32 mode;

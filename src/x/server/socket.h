@@ -52,11 +52,17 @@ struct xserversocketset;
 typedef struct xserversocket xserversocket;
 typedef struct xserversocketset xserversocketset;
 
+struct xserversocketeventsubscription;
+
+typedef struct xserversocketeventsubscription xserversocketeventsubscription;
+
 struct xserversocket
 {
     const xserversocketset * set;
 
+    xserversocketeventsubscription * subscription;
     xsync * sync;
+
     xint32 value;
     xuint32 status;
     xuint32 mode;

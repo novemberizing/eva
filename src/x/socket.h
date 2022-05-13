@@ -50,6 +50,10 @@ struct xsocketset;
 typedef struct xsocket xsocket;
 typedef struct xsocketset xsocketset;
 
+struct xsocketeventsubscription;
+
+typedef struct xsocketeventsubscription xsocketeventsubscription;
+
 struct xsocketset
 {
     xsocket * (*del)(xsocket *);
@@ -67,7 +71,9 @@ struct xsocket
 {
     const xsocketset * set;
 
+    xsocketeventsubscription * subscription;
     xsync * sync;
+
     xint32 value;
     xuint32 status;
     xuint32 mode;

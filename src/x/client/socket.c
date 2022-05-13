@@ -20,6 +20,288 @@ static xuint32 clientsocketInterest(xclientsocket * o);
 
 static xint32 clientsocketShutdown(xclientsocket * o, xint32 how);
 
+static xint32 clientsocketConnect(xclientsocket * o, const void * address, xuint64 addresslen);
+static xint64 clientsocketSend(xclientsocket * o, const unsigned char * message, xuint64 length);
+static xint64 clientsocketRecv(xclientsocket * o, unsigned char * buffer, xuint64 length);
+
+static xclientsocketset virtualSet = {
+    clientsocketDel,
+    clientsocketOpen,
+    clientsocketRead,
+    clientsocketWrite,
+    clientsocketClose,
+    clientsocketInterest,
+    clientsocketShutdown,
+    clientsocketConnect,
+    clientsocketSend,
+    clientsocketRecv
+};
+
+extern xclientsocket * xclientsocketNew(xint32 value, xint32 domain, xint32 type, xint32 protocol, const void * address, xuint64 addresslen, xuint64 size)
+{
+    xclientsocket * o = (xclientsocket *) xsocketNew(value, (xsocketset *) xaddressof(virtualSet), size);
+
+    o->domain = domain;
+    o->type = type;
+    o->protocol = protocol;
+
+    o->address.length = addresslen;
+    o->address.value = malloc(o->address.length);
+    memcpy(o->address.value, address, o->address.length);
+
+    o->stream.in = xstreamNew(8192, 1024);
+    o->stream.out = xstreamNew(8192, 1024);
+
+    return o;
+}
+
+static xclientsocket * clientsocketDel(xclientsocket * o)
+{
+    if(o)
+    {
+        clientsocketClose(o);
+
+        o->stream.in = xstreamDel(o->stream.in);
+        o->stream.out = xstreamDel(o->stream.out);
+
+        xobjectSet(xaddressof(o->address), xnil, 0);
+        o->sync = xsyncDel(o->sync);
+
+        free(o);
+    }
+    return xnil;
+}
+
+static xint32 clientsocketOpen(xclientsocket * o)
+{
+    if(o)
+    {
+        if(o->value < 0)
+        {
+            o->value = socket(o->domain, o->type, o->protocol);
+
+            if(o->value)
+            {
+                // TODO: NONE BLOCK CONNECT
+
+                int ret = connect(o->value, (struct sockaddr *) o->address.value, o->address.length);
+
+                if(ret == xsuccess)
+                {
+                    // TODO: EVENT SUCCESS HANDLING
+                }
+                else
+                {
+                    // TODO: EVENT FAIL HANDLING
+                    close(o->value);
+                    o->value = xclientsocket_invalid_value;
+                }
+            }
+            else
+            {
+                // TODO: EVENT FAIL HANDLING
+            }
+        }
+        return o->value >= 0 ? xsuccess : xfail;
+    }
+    return xfail;
+}
+
+static xint64 clientsocketRead(xclientsocket * o)
+{
+    xint64 ret = xfail;
+
+    if(o->value >= 0)
+    {
+        xstreamReserve(o->stream.in, 8192, 1024);
+        ret = read(o->value, xstreamBack(o->stream.in), xstreamRemain(o->stream.in));
+        if(ret > 0)
+        {
+            o->stream.in->size = o->stream.in->size + ret;
+            // TODO: RECV EVENT HANDLING
+        }
+        else if(ret == 0)
+        {
+            // TODO: CLOSE EVENT HANDLING
+            clientsocketClose(o);
+            ret = xfail;
+        }
+        else
+        {
+            if(errno == EAGAIN)
+            {
+                ret = xsuccess;
+            }
+            else
+            {
+                // TODO: ERROR EVENT HANDLING
+            }
+        }
+    }
+
+    return ret;
+}
+
+static xint64 clientsocketWrite(xclientsocket * o)
+{
+    xint64 ret = xfail;
+    if(o->value >= 0)
+    {
+        if(xstreamLen(o->stream.out) >= 0)
+        {
+            ret = write(o->value, xstreamFront(o->stream.out), xstreamLen(o->stream.out));
+
+            if(ret > 0)
+            {
+                xstreamRem(o->stream.out, ret);
+            }
+            else if(ret == 0)
+            {
+                // TODO: UNKNOWN ERROR HANDLING
+                ret = xfail;
+            }
+            else
+            {
+                if(errno == EAGAIN)
+                {
+                    ret = xsuccess;
+                }
+                else
+                {
+                    // TODO: ERROR HANDLING
+                }
+            }
+        }
+        else
+        {
+            ret = xsuccess;
+        }
+    }
+    return ret;
+}
+
+static xint32 clientsocketClose(xclientsocket * o)
+{
+    if(o->value >= 0)
+    {
+        close(o->value);
+        o->value = xclientsocket_invalid_value;
+        // TODO: ON CLOSE
+    }
+    return xsuccess;
+}
+
+static xuint32 clientsocketInterest(xclientsocket * o)
+{
+    xuint32 interest = xclientsocketevent_none;
+    if(o->value >= 0)
+    {
+        if((o->status & xclientsocketstatus_in) == xclientsocketstatus_none)
+        {
+            interest = interest | xclientsocketevent_in;
+        }
+        if((o->status & xclientsocketstatus_out) == xclientsocketstatus_none)
+        {
+            if(xstreamLen(o->stream.out) > 0)
+            {
+                interest = interest | xclientsocketevent_out;
+            }
+        }
+        if((o->status & xclientsocketstatus_open) == xclientsocketstatus_none)
+        {
+            interest = interest | xclientsocketevent_open;
+        }
+    }
+    else
+    {
+        interest = interest | xclientsocketevent_open;
+    }
+    return xclientsocketevent_none;
+}
+
+static xint32 clientsocketShutdown(xclientsocket * o, xint32 how)
+{
+    if(o->value >= 0)
+    {
+        if(how)
+        {
+            if(how == xclientsocketshutdown_all)
+            {
+                how = SHUT_RDWR;
+            }
+            else if(how == xclientsocketshutdown_in)
+            {
+                how = SHUT_RD;
+            }
+            else if(how == xclientsocketshutdown_out)
+            {
+                how = SHUT_WR;
+            }
+            shutdown(o->value, how);
+            // TODO: EVENT HANDLING
+        }
+    }
+    return xsuccess;
+}
+
+static xint32 clientsocketConnect(xclientsocket * o, const void * address, xuint64 addresslen)
+{
+    if(o->value < 0)
+    {
+        xobjectSet(xaddressof(o->address), address, addresslen);
+
+        o->value = socket(o->domain, o->type, o->protocol);
+
+        if(o->value >= 0)
+        {
+            xint32 ret = connect(o->value, (struct sockaddr *) o->address.value, o->address.length);
+
+            if(ret == xsuccess)
+            {
+                // SUCESS HANDLING
+                return xsuccess;
+            }
+            else
+            {
+                // ERROR HANDLING
+
+                return xfail;
+            }
+        }
+        else
+        {
+            // ERROR HANDLING
+            return xfail;
+        }
+    }
+    return xsuccess;
+}
+
+static xint64 clientsocketSend(xclientsocket * o, const unsigned char * message, xuint64 length)
+{
+    xint64 ret = xfail;
+
+    return ret;
+}
+
+static xint64 clientsocketRecv(xclientsocket * o, unsigned char * buffer, xuint64 length)
+{
+    xint64 ret = xfail;
+
+    return ret;
+}
+
+/**
+static xclientsocket * clientsocketDel(xclientsocket * o);
+
+static xint32 clientsocketOpen(xclientsocket * o);
+static xint64 clientsocketRead(xclientsocket * o);
+static xint64 clientsocketWrite(xclientsocket * o);
+static xint32 clientsocketClose(xclientsocket * o);
+static xuint32 clientsocketInterest(xclientsocket * o);
+
+static xint32 clientsocketShutdown(xclientsocket * o, xint32 how);
+
 static xint32 clientsocketConnect(xclientsocket * o);
 static xint64 clientsocketSend(xclientsocket * o, const unsigned char * message, xuint64 length);
 static xint64 clientsocketRecv(xclientsocket * o, unsigned char * message, xuint64 length);
@@ -301,3 +583,4 @@ static xint64 clientsocketRecv(xclientsocket * o, unsigned char * buffer, xuint6
         }
     }
 }
+*/

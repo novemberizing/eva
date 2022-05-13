@@ -15,11 +15,17 @@ struct xserverset;
 typedef struct xserver xserver;
 typedef struct xserverset xserverset;
 
+struct xservereventsubscription;
+
+typedef struct xservereventsubscription xservereventsubscription;
+
 struct xserver
 {
     const xserverset * set;
 
+    xservereventsubscription * subscription;
     xsync * sync;
+    
     xint32 value;
     xuint32 status;
     xuint32 mode;

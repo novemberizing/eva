@@ -17,10 +17,14 @@ struct xsessionset;
 typedef struct xsession xsession;
 typedef struct xsessionset xsessionset;
 
+struct xsessioneventsubscription;
+typedef struct xsessioneventsubscription xsessioneventsubscription;
+
 struct xsession
 {
     const xsessionset * set;
 
+    xsessioneventsubscription * subscription;
     xsync * sync;
     xint32 value;
     xuint32 status;

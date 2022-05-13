@@ -9,10 +9,15 @@ struct xclientset;
 typedef struct xclient xclient;
 typedef struct xclientset xclientset;
 
+struct xclienteventsubscription;
+
+typedef struct xclienteventsubscription xclienteventsubscription;
+
 struct xclient
 {
     const xclientset * set;
 
+    xclienteventsubscription * subscription;
     xsync * sync;
     xint32 value;
     xuint32 status;

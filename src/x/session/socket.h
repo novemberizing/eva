@@ -53,11 +53,16 @@ struct xsessionsocketset;
 typedef struct xsessionsocket xsessionsocket;
 typedef struct xsessionsocketset xsessionsocketset;
 
+struct xsessionsocketeventsubscription;
+typedef struct xsessionsocketeventsubscription xsessionsocketeventsubscription;
+
 struct xsessionsocket
 {
     const xsessionsocketset * set;
 
+    xsessionsocketeventsubscription * subscription;
     xsync * sync;
+    
     xint32 value;
     xuint32 status;
     xuint32 mode;
