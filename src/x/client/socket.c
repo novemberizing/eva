@@ -74,37 +74,48 @@ static xclientsocket * clientsocketDel(xclientsocket * o)
 
 static xint32 clientsocketOpen(xclientsocket * o)
 {
-    if(o)
+    if(o->value < 0)
     {
-        if(o->value < 0)
+        o->value = socket(o->domain, o->type, o->protocol);
+
+        if(o->value >= 0)
         {
-            o->value = socket(o->domain, o->type, o->protocol);
-
-            if(o->value)
+            if(o->mode == xclientsocketmode_nonblock)
             {
-                // TODO: NONE BLOCK CONNECT
+                xint32 flags = fcntl(o->value, F_GETFL, 0);
+                fcntl(o->value, F_SETFL, flags | O_NONBLOCK);
+            }
 
-                int ret = connect(o->value, (struct sockaddr *) o->address.value, o->address.length);
+            xint32 ret = connect(o->value, (struct sockaddr *) o->address.value, o->address.length);
 
-                if(ret == xsuccess)
+            if(ret == xsuccess)
+            {
+                if(o->subscription)
                 {
-                    // TODO: EVENT SUCCESS HANDLING
-                }
-                else
-                {
-                    // TODO: EVENT FAIL HANDLING
-                    close(o->value);
-                    o->value = xclientsocket_invalid_value;
+                    // o->subscription->on(o, o->subscription, xclientsocketevent_open, ...);
                 }
             }
             else
             {
-                // TODO: EVENT FAIL HANDLING
+                if(o->subscription)
+                {
+                    // o->subscription->on(o, o->subscription, xclientsocketevent_error, xclientsocketevent_open, errno);
+                }                
             }
         }
-        return o->value >= 0 ? xsuccess : xfail;
+        else
+        {
+            if(o->subscription)
+            {
+                // o->subscription->on(o, o->subscription, xclientsocketevent_error, xclientsocketevent_open, errno);
+            }
+            xfunctionError("fail to socket(...) caused by %d", errno);
+
+            return xfail;
+        }
     }
-    return xfail;
+
+    return xsuccess;
 }
 
 static xint64 clientsocketRead(xclientsocket * o)
